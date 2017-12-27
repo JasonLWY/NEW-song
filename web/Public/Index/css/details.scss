@@ -1,0 +1,150 @@
+.sc_details_box {
+    margin-top: 0.1rem;
+    .details_content {
+        width: 90%;
+        margin: 0 auto;
+        #video_box {
+            margin: 0 auto;
+            width: 2.4rem;
+            height: 1.38rem;
+            background-color: #4f4f4f;
+            border: 0.01rem solid #4f4f4f;
+        }
+        .player_info {
+            margin-top: 0.01rem;
+            text-align: center;
+            font-size: 0.14rem;
+            color: #9a7033;
+            .name {
+                margin-left: 0.03rem;
+            }
+            .works {
+                margin-left: 0.03rem;
+            }
+        }
+        .gift_info{
+            color:#b6843b;
+            font-size: 0.13rem;
+            text-align: center;
+            .name{
+                  margin-left: 0.05rem;
+            }
+        }
+        .vote_info {
+            margin-top: 0.01rem;
+            font-size: 0.16rem;
+            text-align: center;
+            .total {
+                color: #FF4F38;
+            }
+            .gift {
+                cursor: pointer;
+                margin-left: 0.05rem;
+            }
+            .click {
+                display: inline-block;
+                background: url('../image/heart.png') no-repeat center;
+                background-size: 0.23rem;
+                width: 0.23rem;
+                height: 0.23rem;
+            }
+            img {
+                cursor: pointer;
+                width: 0.23rem;
+                vertical-align: middle;
+            }
+        }
+        .intro {
+            margin: 0.01rem auto;
+            width: 90%;
+            line-height: 1.8;
+            font-size: 0.12rem;
+            color: #897252;
+            img {
+                max-width: 90% !important;
+            }
+            p {
+                text-align: justify;
+            }
+        }
+        .vote_record {
+            width: 90%;
+            padding: 0.1rem 0;
+            margin-left: 0.15rem;
+            font-size: 0.12rem;
+            color: #dc5548;
+            line-height: 2;
+            max-height: 1.44rem;
+            overflow-x:hidden;
+            overflow-y:auto;
+            .vote_record_box {
+                .single_vote {
+                    position: relative;
+                    line-height: 0.2rem;
+                    margin-top: 0.1rem;
+                    height: 0.38rem;
+                    .name {
+                        position: absolute;
+                        left: 0.45rem;
+                        top: 0;
+                        width: 1.5rem;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                    }
+                    .date {
+                        position: absolute;
+                        left: 0.45rem;
+                        top: 0.2rem;
+                    }
+                    .act {
+                        position: absolute;
+                        left: 1.4rem;
+                        top: 0.2rem;
+                    }
+                    img {
+                        width: 0.38rem;
+                        vertical-align: middle;
+                        padding-right: 0.02rem;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//广告轮播
+.flexslider_ad{
+    width: 90%;
+    height: 0.8rem;
+    margin: 0.2rem auto;
+    .slides{
+        width:100%;
+        height: 100%;
+        li{
+            height: 0.8rem;
+            img{
+                width:100%;
+                height:100%;
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+    }
+    .flex-control-nav{
+        display:none;
+    }
+}
+
+.loadingbox{
+    font-size:0.12rem;
+    text-align:center;
+    color:#999;
+    padding:0.1rem 0;
+    line-height:0.16rem;
+    img{
+        position:relative;
+        top:0.03rem;
+        margin-right:0.05rem;
+    }
+}

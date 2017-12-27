@@ -1,0 +1,47 @@
+.sc_gift_box .gift_bag_title { width: 100%; height: 0.655rem; line-height: 0.655rem; font-size: 0.25rem; text-align: center; color: #b38433; background: url("../image/gift_title_bg.png") no-repeat center; background-size: 100% 100%; position: relative; }
+.sc_gift_box .left_orn { width: 0.72rem; height: 0.9rem; background: url("../image/left_ornament.png") no-repeat center; background-size: 100% 100%; position: absolute; top: -0.18rem; left: 0.25rem; z-index: 5; }
+.sc_gift_box .right_orn { width: 0.78rem; height: 0.82rem; background: url("../image/right_ornament.png") no-repeat center; background-size: 100% 100%; position: absolute; top: -0.1rem; right: 0.18rem; z-index: 5; }
+.sc_gift_box .gift_bag_list { width: 2.87rem; height: 2.2rem; margin: 0.05rem auto; }
+.sc_gift_box .gift_bag_list .bag_box { margin: 0 auto; }
+.sc_gift_box .gift_bag_list .bag_box .single_bag { float: left; width: 1.24rem; height: 1rem; border: 0.07rem solid #edeaea; position: relative; }
+.sc_gift_box .gift_bag_list .bag_box .single_bag:nth-child(even) { margin-left: 0.1rem; }
+.sc_gift_box .gift_bag_list .bag_box .single_bag:nth-child(n+1) { margin-top: 0.1rem; }
+.sc_gift_box .gift_bag_list .bag_box .single_bag .bag_cover { width: 1.24rem; height: 0.84rem; }
+.sc_gift_box .gift_bag_list .bag_box .single_bag .name { position: absolute; top: 0; left: 0; font-size: 0.12rem; color: #fefefe; background: #caa700; padding: 0.03rem; max-width: 0.65rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc_gift_box .gift_bag_list .bag_box .single_bag .price { font-size: 0.12rem; color: #ea2e2e; }
+.sc_gift_box .gift_bag_list .bag_box .single_bag .particulars { float: right; font-size: 0.1rem; color: #464545; margin-right: 0.07rem; margin-top: 0.02rem; }
+
+.loadingbox { font-size: 0.12rem; text-align: center; color: #999; padding: 0.1rem 0; line-height: 0.16rem; }
+.loadingbox img { position: relative; top: 0.03rem; margin-right: 0.05rem; }
+
+.gift_bag_btn .my_gift_bag { display: block; margin: 0.13rem auto; width: 1.12rem; height: 0.35rem; line-height: 0.35rem; font-weight: 600; color: #ecca29; font-size: 0.16rem; text-align: center; background: url("../image/gift_btn.png") no-repeat center; background-size: 100% 100%; cursor: pointer; }
+
+.my_left_orn { width: 0.72rem; height: 0.9rem; background: url("../image/left_ornament.png") no-repeat center; background-size: 100% 100%; position: absolute; top: -0.18rem; left: 0.6rem; z-index: 5; }
+
+.my_right_orn { width: 0.78rem; height: 0.82rem; background: url("../image/right_ornament.png") no-repeat center; background-size: 100% 100%; position: absolute; top: -0.1rem; right: 0.45rem; z-index: 5; }
+
+.my_bag_list { height: 1.45rem; }
+.my_bag_list .bought_bag { width: 2.55rem; height: 1.07rem; margin: 0.13rem auto; border: 1px solid #bbbbbb; position: relative; color: #9b9b9b; font-size: 0.12rem; }
+.my_bag_list .bought_bag .name { font-weight: 600; margin: 0.03rem 0.06rem; }
+.my_bag_list .bought_bag .bag_cover { float: left; width: 0.78rem; height: 0.56rem; margin: 0.07rem 0.03rem; }
+.my_bag_list .bought_bag .sub { float: left; width: 1.44rem; font-size: 0.1rem; padding: 0.1rem; }
+.my_bag_list .bought_bag .price { position: absolute; min-width: 1rem; left: 0.05rem; bottom: 0.02rem; }
+.my_bag_list .bought_bag .details { position: absolute; right: 0.05rem; bottom: 0.02rem; }
+.my_bag_list .bought_bag .quantity { position: absolute; max-width: 0.5rem; left: 1.1rem; bottom: 0.02rem; }
+
+.dot_line { width: 82%; margin: 0 auto; height: 0.02rem; border: none; border-top: 0.02rem dotted #bbbbbb; }
+
+.confirm_info { width: 2.44rem; min-height: 2.3rem; position: relative; }
+.confirm_info ul { list-style: none; margin-top: 0.14rem; }
+.confirm_info ul li { padding: 0.1rem 0; font-size: 0.15rem; color: #50504f; margin-left: 0.25rem; }
+.confirm_info ul li .gift_bag_input { width: 1.26rem; height: 0.23rem; line-height: 0.23rem; text-indent: 0.05rem; }
+.confirm_info ul li .status { display: inline-block; width: 0.64rem; height: 0.31rem; line-height: 0.31rem; font-size: 0.15rem; text-align: center; background: #fada48; }
+.confirm_info .close { position: absolute; top: -0.13rem; right: 0.05rem; cursor: pointer; }
+
+.gift_bag_input { width: 1.26rem; height: 0.23rem; line-height: 0.23rem; text-indent: 0.05rem; }
+
+.pattern { width: 85%; margin: 0.1rem auto; padding: 0.05rem; font-size: 0.11rem; color: #FF6000; line-height: 1.1; border: 1px solid #b38433; border-radius: 0.1rem; }
+.pattern .item { font-size: 0.12rem; color: #FF0000; margin-top: 0.05rem; display: block; }
+.pattern .item:first-child { margin-top: 0; }
+
+/*# sourceMappingURL=gift.css.map */

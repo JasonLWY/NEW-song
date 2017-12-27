@@ -1,0 +1,30 @@
+<php>
+	$tag="model_id:2;cid:$cid;is_show:1;pageSize:12"; $img_list=yc_get_list($tag);
+</php>
+<!-- 广告轮播图start -->
+<div class="flexslider">
+	<ul class="slides">
+		<foreach name="img_list['list']" item="item">
+			<li>
+                <empty name="item['link_url']">
+                    <a href="{:U('Index/ad',array('aid'=>$item['aid'],'type'=>$type))}"><img src="{$item['pic'][0]['path']}" /></a>
+                <else/>
+                    <a href="{$item.link_url}"><img src="{$item['pic'][0]['path']}" /></a>
+                </empty>
+			</li>
+		</foreach>
+	</ul>
+</div>
+<!-- 广告轮播图end -->
+<script>
+	//广告轮播
+	$(document).ready(function() {
+		$('.flexslider').flexslider({
+			animation: "slide",
+			directionNav: false,
+			pauseOnAction: false,
+			slideshowSpeed: 3000,
+		});
+	});
+</script>	
+

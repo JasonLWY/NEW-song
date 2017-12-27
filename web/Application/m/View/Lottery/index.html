@@ -1,0 +1,163 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<link rel="stylesheet" href="__PUBLIC__/treasure/css/reset.css">
+		<link rel="stylesheet" href="__PUBLIC__/treasure/css/atom.css">
+		<link rel="stylesheet" href="__PUBLIC__/treasure/css/global.css">
+		<link rel="stylesheet" href="__PUBLIC__/treasure/css/open.css">
+		<link rel="stylesheet" href="__PUBLIC__/Index/css/lottery.css">
+		<link rel="stylesheet" href="__PUBLIC__/Index/css/common.css">
+		<script src="__PUBLIC__/Common/js/jquery-1.8.3.min.js"></script>
+		<script src="__PUBLIC__/Index/js/common.js?version={$version}"></script>
+		<script src="__PUBLIC__/layer_mobile/layer.js"></script>
+		<title>我的抽奖</title>
+	</head>
+
+	<body ontouchstart="" class="open-body">
+		<div class="wrapper">
+
+			<div class="bg rotate"></div>
+			<div class="open-has ">
+				<h3 class="title-close clearfix">
+      </h3>
+				<div class="mod-chest">
+
+					<div class="chest-close show ">
+						<div class="gift"></div>
+						<div class="tips">
+							<i class="arrow"></i>
+						</div>
+					</div>
+
+					<div class="chest-open ">
+						<div class="mod-chest-cont open-cont">
+							<div class="content">
+								<div class="award_info">恭喜你，</br>获得<span class="award_item"></span><span class="goods_name"></span></div>
+								<div class="gift">
+
+								</div>
+								<div class="icon"><img src="__PUBLIC__/treasure/img/chest-icon-zuan.png" class="goods_img"></div>
+								<div class="func">
+									<button class="chest-btn"><a href="{:U('Lottery/award')}" class="view_my_award">查看领取详情</a></button>
+								</div>
+								<div class="close" onclick="close_box()">
+									<img src="__PUBLIC__/Index/image/close.png"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="times_box"> 
+			<img src="__PUBLIC__/Index/image/chance.png" class="chance">
+			你有<span class="user times">{$lotteryTimes|default=0}</span>次机会
+		</div>
+		
+		<eq name="lotteryTimes" vlaue="0">
+			<else/>
+			<div class="once_again" onclick="doAgain()"  style="cursor: pointer;">再抽一次</div>
+		</eq>
+		
+		<div class="my_precious">
+			<a href="{:U('Lottery/award')}" style="cursor: pointer;">我的奖品</a>
+		</div>
+
+		<script type="text/javascript" src="__PUBLIC__/treasure/js/zepto.min.js"></script>
+		<script type="text/javascript">
+			$(function(){
+				$('.once_again').hide();
+			})
+			var enable_to_draw=1; //是否能进行抽奖，1为能
+
+		
+			$(".chest-close").click(function() {
+				var times=$(".times").text();
+				if(enable_to_draw==0){
+					return false;
+				}
+				if(times==0){
+					msg("抽奖次数不足！");
+					return false;
+				}
+				$(this).addClass("shake");
+				var that = this;
+				var url = "{:U('Lottery/drawLottery')}"
+				enable_to_draw=0;
+				$.ajax({
+					type: 'post',
+					url: url,
+					dataType: 'json',
+					success: function(data) {
+						if(data.times>1){
+							$('.once_again').show();
+						}
+						var currentTimes = data.times-1;
+						$(".times").text(currentTimes);
+						if(currentTimes<1){
+							$('.once_again').hide();
+						}
+						if(data.status == 1) {
+							$(that).closest(".open-has").addClass("opened");
+							
+							setTimeout(function() {
+								$(that).removeClass("show");
+								$('.icon').show();
+								$('.chest-open').find('.award_info').show();
+								$('.chest-open').find('.gift').hide();
+								$('.award_item').text(data.item);
+								$('.goods_name').text(data.prize);
+								$('.goods_img').attr("src", data.img);
+								$(that).closest(".mod-chest").find(".chest-open").addClass("show");
+								setTimeout(function() {
+									$(".chest-open").addClass("blur");
+								}, 500)
+							}, 200)
+						} else {
+							$(that).closest(".open-has").addClass("opened");
+							$('.icon').hide();
+							$('.chest-open').find('.award_info').hide();
+							$('.chest-open').find('.gift').show();
+							setTimeout(function() {
+								$(that).removeClass("show");
+								$(that).closest(".mod-chest").find(".chest-open").addClass("show");
+								setTimeout(function() {
+									$(".chest-open").addClass("blur");
+								}, 500)
+								$('.gift').text(data.award_info);
+							}, 200);
+
+						}
+						setTimeout(function() {enable_to_draw=1;},500)
+					}
+				});
+			})
+			
+			function doAgain() {
+				close_box();
+				setTimeout(function(){
+					$(".chest-close").click();
+				},500)
+			}
+			
+			function close_box(){
+				$(".chest-close").removeClass("shake");
+				$(".gift").text("");
+				$(".chest-close").addClass("show");
+				$('.open-has').removeClass("opened");
+				$('.chest-open').removeClass("show");
+				$('.chest-open').removeClass("blur");
+			}
+		</script>
+        <include file="Public:wx_share"/>
+    </body>
+
+</html>

@@ -1,0 +1,140 @@
+<div style="width: 100%;height: 0.49rem;position:fixed;bottom:0;"></div>
+<div class="sc_bottom">
+	<ul>
+		<li class="bot_btn">
+			<a href="{:U('Index/index')}">
+				<eq name="Think.CONTROLLER_NAME" value="Index">
+					<eq name="Think.ACTION_NAME" value="player">
+						<img src="__PUBLIC__/Index/image/indexs.png">
+					<else/>
+						<img src="__PUBLIC__/Index/image/index.png">
+					</eq>
+				<else/>
+					<img src="__PUBLIC__/Index/image/index.png">
+				</eq>
+				<span <eq name="Think.CONTROLLER_NAME" value="Index"> <eq name="Think.ACTION_NAME" value="player"> name class="selected" </eq> </eq>>首页</span>
+			</a>
+		</li>
+		<li class="bot_btn">
+			<a href="{:U('Intro/index',array('type'=>$type))}">
+				<eq name="Think.CONTROLLER_NAME" value="Intro">
+					<img src="__PUBLIC__/Index/image/introduces.png">
+				<else/>
+					<img src="__PUBLIC__/Index/image/introduce.png">
+				</eq>
+				<span <eq name="Think.CONTROLLER_NAME" value="Intro"> class="selected" </eq>>大赛介绍</span>
+			</a>
+		</li>
+		<li class="bot_btn bot_btns">
+			<div class="bot_search">
+				<img src="__PUBLIC__/Index/image/search.png">
+				<span>搜索</span>
+			</div>
+		</li>
+		<li class="bot_btn">
+			<a href="{:U('Ranking/index',array('type'=>$type))}">
+				<eq name="Think.CONTROLLER_NAME" value="Ranking">
+					<img src="__PUBLIC__/Index/image/rankings.png">
+				<else/>
+					<img src="__PUBLIC__/Index/image/ranking.png">
+				</eq>
+				<span <eq name="Think.CONTROLLER_NAME" value="Ranking"> class="selected" </eq>>排行</span>
+			</a>
+		</li>
+		<li class="bot_btn  ">
+			<a href="{:U('Rules/index',array('type'=>$type))}">
+				<eq name="Think.CONTROLLER_NAME" value="Rules">
+					<img src="__PUBLIC__/Index/image/rules.png">
+				<else/>
+					<img src="__PUBLIC__/Index/image/rule.png">
+				</eq>
+				<span <eq name="Think.CONTROLLER_NAME" value="Rules"> class="selected" </eq>>规则</span>
+			</a>
+		</li>
+	</ul>
+</div>
+
+<script type="text/javascript">
+	var video='';
+
+    window.onload = function(){
+        $("body").css("visibility","visible");
+    };
+
+	$(function() {
+		/**
+		 * 按返回事件
+		 */
+		window.addEventListener("popstate", function() {
+			var currentState = history.state;
+			console.log(currentState);
+			closeSearch();
+		});
+
+		/**
+		 * 显示搜索
+		 */
+		$(".bot_search").click(function() {
+			$('#video_box').css("background","url('__PUBLIC__/Index/image/video_bg.jpg') no-repeat center");
+			$('#video_box').css("background-size","100%");
+		    video=$('#video_box').html();
+		    $('#video').remove();
+			var currentState = history.state;
+			var searchAct = '';
+			if(currentState) {
+				searchAct = currentState.act;
+			}
+			if(searchAct == 'search') {
+				//如果不是第一次点搜索按钮，就替换历史。避免多次按返回键不关闭搜索弹窗
+				history.replaceState({
+					"act": "search"
+				}, "searchpage", "#search"); //添加并替换历史纪录
+			} else {
+				history.pushState({
+					"act": "search"
+				}, "searchpage", "#search"); //添加并替换历史纪录
+			}
+
+			$("body").addClass('noscorller'); //禁止滚动条滚动
+
+			$(".search_side").fadeIn(300);
+			$(this).css({
+				color: "#e23232",
+				backgroundColor: "#fdd5d5"
+			});
+
+		});
+		$(".search_close").click(function() {
+			closeSearch();
+			history.go(-1);
+		});
+
+		/**
+		 * 关闭搜索
+		 */
+		function closeSearch() {
+			$("body").removeClass('noscorller'); //允许滚动条滚动
+			$(".search_side").hide();
+			$(".bot_search").css({
+				color: "#333",
+				backgroundColor: "#fff"
+			});
+			$('#video_box').html(video);
+		}
+	});
+//	style: 'position:fixed;top:10%;left:10%;bottom:1rem; width: 2.6rem;border:none;border-radius:0.05rem;height:3.8rem;'
+</script>
+<include file="Public:wx_share"/>
+<div class="search_side">
+	<div class="search_close">×</div>
+	<div class="search_con">
+		<form action="{:U('Search/index')}" method="get">
+            <input type="hidden" name="c" value="Search" />
+            <input type="hidden" name="type" value="{$type}" />
+			<input type="text" name="keyword" placeholder="输入搜索人姓名或编号" class="search_fram">
+			<input type="submit" value="" class="sub_btn" />
+		</form>
+		<span>分享搜索成功页，拉票更容易~</span>
+	</div>
+</div>
+

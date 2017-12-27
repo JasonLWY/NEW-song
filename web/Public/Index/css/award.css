@@ -1,0 +1,20 @@
+.prize_box .header { text-align: center; font-size: 0.2rem; background: #000; padding: 0.1rem; color: #FFFFFF; }
+.prize_box .pattern { width: 85%; margin: 0.1rem auto; padding: 0.05rem; font-size: 0.11rem; color: #FF6000; line-height: 1.1; border: 1px solid #6c6c6c; border-radius: 0.1rem; }
+.prize_box .pattern .item { font-size: 0.12rem; color: #FF0000; margin-top: 0.05rem; display: block; }
+.prize_box .pattern .item:first-child { margin-top: 0; }
+.prize_box .prize_list { margin-top: 0.1rem; }
+.prize_box .prize_list .single_prize { width: 95%; height: 0.8rem; margin: 0.2rem auto; background: #F2F2F2; }
+.prize_box .prize_list .single_prize .prize_pic { float: left; width: 0.6rem; height: 0.6rem; padding: 0.1rem 0.1rem; }
+.prize_box .prize_list .single_prize .prize_pic img { width: 0.6rem; height: 0.6rem; }
+.prize_box .prize_list .single_prize .info { float: left; padding: 0.08rem 0; width: 45%; line-height: 1.7; }
+.prize_box .prize_list .single_prize .info .item { font-size: 0.14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prize_box .prize_list .single_prize .info .code { font-size: 0.12rem; }
+.prize_box .prize_list .single_prize .info .time { font-size: 0.12rem; }
+.prize_box .prize_list .single_prize .redden { float: left; width: 22%; height: 0.4rem; margin: 0.2rem 0.09rem; background: #FF0000; border-radius: 0.05rem; color: #FFFFFF; font-weight: 600; text-align: center; line-height: 0.4rem; }
+.prize_box .prize_list .single_prize .grey { color: #FFFFFF; background: #6c6c6c; }
+
+.redden_info { width: 2rem; }
+.redden_info .tips { color: #ff6000; font-size: 0.18rem; line-height: 0.2rem; padding: 0.2rem 0; }
+.redden_info .redden_psw { width: 80%; margin: 0 auto; height: 0.24rem; border-radius: 0.05rem; border: 1px solid #FF6000; text-indent: 0.04rem; font-size: 0.2rem; }
+
+/*# sourceMappingURL=award.css.map */

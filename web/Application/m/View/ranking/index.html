@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/index/css/ranking.css?version={$version}">
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/index/css/swiper.min.css?version={$version}">
+	</head>
+
+	<body style="visibility:hidden;">
+		<!--顶部轮播图-->
+		<include file="Public:top_banner"/>
+		<!--顶部轮播图-->
+
+		<!-- 排行榜start -->
+		<div class="ranking_content">
+			<div class="ranking_title">排行榜</div>
+			<div class="ranking_head clearfix">
+				<span>名次</span>
+				<span>封面图</span>
+				<span>编号</span>
+				<span>姓名</span>
+                <php>
+                    if($type==1){
+                        $rankType=!($type&&$sysInfo['promotion']);
+                    }else{
+                        $rankType=$type;
+                    }
+                </php>
+                <eq name="rankType" value="0">
+                    <span>票数</span>
+                <else/>
+                    <span>浏览数</span>
+                </eq>
+			</div>
+			<php>
+
+			</php>
+			<div class="ranking_list_content">
+				<div class="ranking_box">
+
+				</div>
+				<div class="loadingbox" id="loadingBox" style="display:none">
+					<img src="__PUBLIC__/index/image/onLoad.gif" />加载中...
+				</div>
+				<div class="loadingbox" id="endBox" style="display:none">
+					加载完了
+				</div>
+				<div class="loading" style="height:0.15rem;"></div>
+			</div>
+
+		</div>
+		<!-- 排行榜end -->
+
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 搜索层end -->
+		<script src="__PUBLIC__/Index/js/swiper.min.js"></script>
+		<script>
+			var currentP = 0; //当前页
+			var keyword = ''; //关键词
+			var ableLoad = 1; //能否加载，1为能
+			var isLoading = 0; //是否正在加载
+			var all_page = 1;
+
+			function initBox() {
+				var contentHeight = $(window).height() - $(".flexslider").height() - $('.ranking_title').height() - $('.ranking_head').height() - $(".sc_bottom").height() - 10;
+				$('.ranking_list_content').height(contentHeight);
+				var currentState = history.state; //添加当前记录
+				if(currentState) {
+					currentP = currentState.p;
+				}
+				if(currentP == 0) {
+					sessionStorage['ranking_box_html'] = '';
+					loadPage();
+				} else {
+					$(".ranking_box").html(sessionStorage['ranking_box_html']); //装载旧业面的HTML
+					$(".ranking_list_content").scrollTop(sessionStorage['sc_scroll_top']); //滚动到旧页面的位置
+				}
+				$(".sc_load_a").live('click', function() {
+					sessionStorage['sc_scroll_top'] = $(".ranking_list_content").scrollTop(); //记住旧页面的滚动条位置
+				});
+			}
+
+			function loadPage() {
+				history.replaceState({
+					"p": currentP
+				}, "loadPage" + currentP, "#" + currentP); //添加并替换历史纪录
+				if(ableLoad == 0 || isLoading == 1) {
+					//页面加载完了
+					return;
+				}
+				if(currentP >= all_page) {
+					$("#endBox").show();
+					return;
+				}
+				$("#loadingBox").show();
+				isLoading = 1;
+				var url = "{:U('api/getRank',array('type'=>$type))}"; //查询地址
+				var query = new Object(); //查询参数
+				query.p = parseInt(currentP) + 1;
+				query.keyword = keyword;
+				$.post(url, query, function(data) {
+					var html = '';
+					var len = data.data.length;
+					var type="{$rankType}";
+					all_page = data.all_page;
+					for(var i = 0; i < len; i++) {
+						var obj = data.data[i];
+//						html += '<a class="sc_load_a" href="' + obj.url + '">';
+                        html += '<a class="sc_load_a" href="javascript:void(0)">';
+						html += '<div class="rli clearfix"> ';
+						html += '<div class="rli_num">' + obj.rank + '</div>';
+						html += '<div class="rli_paint">';
+						html += '<img src="' + obj.pic + '" >';
+						html += '</div>';
+						html += '<div class="rli_number">' + obj.number + '</div>';
+						html += '<div class="rli_number"> ' + obj.name + '</div>';
+						if(type==0){
+                            html += '<div class="rli_numvotes">' + obj.votes + '</div>';
+                        }else{
+                            html += '<div class="rli_numvotes">' + obj.seecount + '</div>';
+						}
+						html += '</div></a>';
+					}
+					$('.ranking_box').append(html);
+					sessionStorage['ranking_box_html'] = $(".ranking_box").html();
+					sessionStorage['sc_scroll_top'] = $(".ranking_list_content").scrollTop();
+					currentP = data.p;
+					if(currentP >= data.all_page) {
+						ableLoad = 0;
+						$("#endBox").show();
+						console.log('没有了');
+					}
+					$("#loadingBox").hide();
+					isLoading = 0;
+				}, "json");
+			}
+
+			$(function() {
+				setTimeout(function() {
+					initBox();
+				}, 500);
+
+				$(".ranking_list_content").scroll(function() {
+					var scrolltop = $(this).scrollTop();
+					var scrollheight = $(this).height();
+					var boxheight = $(".ranking_box").height();
+					var paddingHeight = 10;
+					totalheight = parseFloat(scrollheight) + parseFloat(scrolltop) + paddingHeight;
+					//浏览器的高度加上滚动条的高度 
+					if(boxheight <= totalheight) //当文档的高度小于或者等于总的高度的时候，开始动态加载数据
+					{
+						loadPage();
+						//加载数据
+						console.log('begin load');
+					}
+				});
+			});
+			
+			
+
+		</script>
+	</body>
+
+</html>

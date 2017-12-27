@@ -1,0 +1,240 @@
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/swiper.min.css">
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/index.css?version={$version}">
+	</head>
+
+	<body style="visibility:hidden;">
+		<!--顶部轮播图-->
+		<include file="Public:top_banner" />
+		<!--顶部轮播图-->
+		<div class="search_res" style="display:none;">
+			<notempty name="keyword">关键词：<span class="keyword"> {$keyword} </span> ，</notempty> 共<span id="resNum"></span>条结果
+		</div>
+        <php>
+            $vote_flag=1;
+            if($type==1){
+                if(!$sysInfo['promotion']){
+                    $vote_flag=0;
+                }
+            }
+        </php>
+		<!-- 内容列表start -->
+		<div class="sc_content auto_load">
+			<div class="sc_box  clearfix"></div>
+			<div class="loadingbox" id="loadingBox" style="display:none">
+				<img src="__PUBLIC__/Index/image/onLoad.gif" />加载中...
+			</div>
+			<div class="loadingbox" id="endBox" style="display:none">
+				加载完了
+			</div>
+			<div style="height: 0.05rem;"></div>
+		</div>
+		<!-- 内容列表end -->
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 搜索层end -->
+		<!-- 隐藏弹出层-->
+		<include file="Public:gift" />
+		<!--END 隐藏弹出层-->
+
+		<script src="__PUBLIC__/Index/js/swiper.min.js"></script>
+		<script>
+			var currentP = 0;
+			var keyword = '{$keyword}';
+			var ableLoad = 1;
+			var isLoading = 0; //是否正在加载
+			var all_page = 1;
+            var vote_flag="{$vote_flag}";
+
+			//点击变红心
+			$(".icon_heart").live('click',function() {
+				var index = layer.open({
+					type: 2
+				});
+				var img = $(this);
+				var div = $(this).parent();
+				var player_id = div.find("input").val();
+                var classN = '.player' + player_id;
+                var url = "{:U('Api/vote')}";
+				$.post(url, {
+					player_id: player_id
+				}, function(data) {
+					if(data.status == 1) {
+                        $(classN).attr("src", "__PUBLIC__/Index/image/hearts.png");
+                        var vote = parseInt(div.prev().html().replace(/票/, "")) + 1;
+                        if(vote<=1000000){
+                            div.prev().html(vote + '票');
+                        }
+                        sessionStorage['sc_box_html'] = $(".sc_box").html();
+                    } else {
+                        msg(data.info);
+					}
+					layer.close(index);
+				});
+			});
+
+			var $click = 0;
+
+			//sc_content init
+			function initBox() {
+				var contentHeight = $(window).height() - $(".flexslider").height() - $(".sc_bottom").height() - 30;
+				console.log($(window).height());
+				console.log($(".bo_bg").height());
+				console.log($(".swiper-container").height());
+				console.log($(".sc_bottom").height());
+				console.log(contentHeight);
+				$(".sc_content").height(contentHeight);
+				// historyCheck();
+				var currentState = history.state;
+				if(currentState) {
+					currentP = currentState.p;
+				}
+				console.log(currentP);
+				if(currentP == 0) {
+					//currentP=0；表示新页面
+					sessionStorage['sc_box_html'] = '';
+					loadPage();
+				} else {
+					//currentP>0；表示旧页面
+					$(".sc_box").html(sessionStorage['sc_box_html']); //转载就业面的HTML
+					$(".sc_content").scrollTop(sessionStorage['sc_scroll_top']); //滚动到旧页面的位置
+                    readVoteNum();
+				}
+				$(".sc_load_a").live('click', function() {
+					sessionStorage['sc_scroll_top'] = $(".sc_content").scrollTop(); //记住旧页面的滚动条位置
+				});
+			}
+
+            /**
+             * lzj:读取上一页的票数，即保证历史列表，也保证数量最新
+             */
+            function readVoteNum(){
+                var str=sessionStorage['vote_num'];
+                var vflag=sessionStorage['vflag'];
+                console.log(str);
+                if(vflag==1){
+                    voteNum=JSON.parse(str);//转为对象
+                    console.log(voteNum);
+                    if(vote_flag==1){
+                        $(".vote_num_"+voteNum.player_id).text(voteNum.vote+'票');
+                        $(".player"+voteNum.player_id).attr('src',"__PUBLIC__/Index/image/hearts.png");
+                    }else{
+                    	 $(".vote_num_"+voteNum.player_id).text(voteNum.vote+'票');
+                        $(".player"+voteNum.player_id).attr('src',"__PUBLIC__/Index/image/hearts.png");
+                        // console.log(voteNum);
+                        // $(".vote_num_"+voteNum.player_id).text(voteNum.vote+'次');
+                    }
+                    sessionStorage['vote_num']='';
+                    sessionStorage['sc_box_html'] = $(".sc_box").html();
+                }
+
+            }
+
+			function loadPage() {
+				history.replaceState({
+					"p": currentP
+				}, "loadPage" + currentP, "#" + currentP); //添加并替换历史纪录
+				if(ableLoad == 0 || isLoading == 1) {
+					//页面加载完了
+					return;
+				}
+				if(currentP >= all_page) {
+					$("#endBox").show();
+					return;
+				}
+				$("#loadingBox").show();
+				isLoading = 1;
+				var url = "{:U('Search/getSearch',array('type'=>$type))}"; //查询地址
+				var query = new Object(); //查询参数
+
+				query.p = parseInt(currentP) + 1;
+				query.keyword = keyword;
+				$.post(url, query, function(data) {
+					if(data.status != 1) {
+						msgFaild(data.info);
+						return;
+					}
+					var type="{$type}";
+					var html = '';
+					var len = data.data.length;
+					all_page = data.all_page;
+					$("#resNum").text(data.count);
+					for(var i = 0; i < len; i++) {
+						var obj = data.data[i];
+						html += '<div class="scc_list"> ';
+						html += '<div class="scli_head"> ';
+						html += '<a class="sc_load_a" href="' + obj.url + '">';
+						html += '<img src="' + obj.pic + '"> ';
+						html += '</a>';
+						html += '<div class="schead_title clearfix"> ';
+						html += '<span>' + obj.name + '</span> ';
+						html += '	<img src="__PUBLIC__/Index/image/play.png"> ';
+						html += '</div></div>';
+						html += '<div class="scli_bottom clearfix"> ';
+						if(type==0){
+                            html += '<span class="vote_num_'+obj.player_id+'">' + obj.votes + '票</span> ';
+                        }else{
+                        	html += '<span class="vote_num_'+obj.player_id+'">' + obj.votes + '票</span> ';
+                            // html += '<span class="vote_num_'+obj.player_id+'">浏览' + obj.seecount + '次</span> ';
+						}
+						html += '<div class="scbot_icon"> ';
+						html += '<input type="hidden" value="' + obj.player_id + '"/>';
+                        if(vote_flag==1){
+                            html += '	<img src="__PUBLIC__/Index/image/gift.png" ';
+                            html += ' player_id="' + obj.player_id + '" name="' + obj.name + '" works="' + obj.works + '" ';
+                            html += ' number="' + obj.number + '" pic="' + obj.pic + '" ';
+                            html += ' votes="' + obj.votes + '" ';
+                            html += '	class="icon_gift">';
+                            if(obj.vflag == 1) {
+                                html += '<img src="__PUBLIC__/Index/image/hearts.png" class="icon_heart player' + obj.player_id + '">';
+                            } else {
+                                html += '<img src="__PUBLIC__/Index/image/heart1.png" class="icon_heart player' + obj.player_id + '">';
+                            }
+                        }
+						html += '</div> ';
+						html += '</div></div>';
+					}
+					$('.sc_box').append(html);
+					sessionStorage['sc_box_html'] = $(".sc_box").html();
+					sessionStorage['sc_scroll_top'] = $(".sc_content").scrollTop();
+					currentP = data.p;
+					if(currentP >= data.all_page) {
+						ableLoad = 0;
+						$("#endBox").show();
+						console.log('没有了');
+					}
+					$("#loadingBox").hide();
+					isLoading = 0;
+				}, "json");
+			}
+
+			$(function() {
+				setTimeout(function() {
+					initBox();
+					$('.search_res').show();
+				}, 500);
+
+				// $(".sc_content").
+				$(".sc_content").scroll(function() {
+					var scrolltop = $(this).scrollTop();
+					var scrollheight = $(this).height();
+					var boxheight = $(".sc_box").height();
+					var paddingHeight = 10;
+					totalheight = parseFloat(scrollheight) + parseFloat(scrolltop) + paddingHeight;
+					//浏览器的高度加上滚动条的高度
+
+					if(boxheight <= totalheight) //当文档的高度小于或者等于总的高度的时候，开始动态加载数据
+					{
+						loadPage();
+						//加载数据
+						console.log('begin load');
+					}
+				});
+
+			});
+		</script>
+
+</html>

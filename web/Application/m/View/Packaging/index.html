@@ -1,0 +1,144 @@
+<include file="Public:doctype" />
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/gift.css?version={$version}">
+	</head>
+
+	<body style="visibility:hidden;">
+		<div class="rool_content" style="overflow: auto;">
+			<!--顶部轮播图-->
+			<include file="Public:top_banner" />
+			<!--顶部轮播图-->
+	
+			<div class="sc_gift_box">
+				<div class="gift_bag_title">
+					<div class="left_orn"></div>
+					<span>新歌声在线购票</span>
+					<div class="right_orn"></div>
+				</div>
+	
+				<div class="gift_bag_list clearfix">
+					<div class="bag_box clearfix">
+					</div>
+					
+					<div class="loadingbox" id="loadingBox" style="display:none">
+						<img src="__PUBLIC__/index/image/onLoad.gif" />加载中...
+					</div>
+					<div class="loadingbox" id="endBox" style="display:none">
+						加载完了
+					</div>
+					<div class="loading" style="height:0.15rem;"></div>
+				</div>
+			</div>
+		</div>
+
+        <eq name="pack_flag" value="1">
+            <div class="gift_bag_btn">
+                <a href="{:U('Packaging/mypack',array('type'=>1))}" class="my_gift_bag">我的门票</a>
+            </div>
+        </eq>
+
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 底部栏end -->
+
+		<script>
+			var currentP = 0; //当前页
+			var keyword = ''; //关键词
+			var ableLoad = 1; //能否加载，1为能
+			var isLoading = 0; //是否正在加载
+			var all_page = 1;
+
+			function initBox() {
+				var contentHeight = $(window).height() - $(".gift_bag_btn").height() - $(".sc_bottom").height() - 35;
+				$('.rool_content').height(contentHeight);
+				var currentState = history.state; //添加当前记录
+				if(currentState) {
+					currentP = currentState.p;
+				}
+				if(currentP == 0) {
+					sessionStorage['bag_box_html'] = '';
+					loadPage();
+				} else {
+					$(".bag_box").html(sessionStorage['bag_box_html']); //装载旧业面的HTML
+					$(".rool_content").scrollTop(sessionStorage['bag_scroll_top']); //滚动到旧页面的位置
+				}
+				$(".details").live('click', function() {
+					sessionStorage['bag_scroll_top'] = $(".rool_content").scrollTop(); //记住旧页面的滚动条位置
+				});
+			}
+
+			function loadPage() {
+				history.replaceState({
+					"p": currentP
+				}, "loadPage" + currentP, "#" + currentP); //添加并替换历史纪录
+				if(ableLoad == 0 || isLoading == 1) {
+					//页面加载完了
+					return;
+				}
+				if(currentP >= all_page) {
+					$("#endBox").show();
+					return;
+				}
+				$("#loadingBox").show();
+				isLoading = 1;
+				var url = "{:U('Api/packList')}"; //查询地址
+				var query = new Object(); //查询参数
+				query.p = parseInt(currentP) + 1;
+				query.pageSize=4;
+				$.post(url, query, function(data) {
+					var html = '';
+					var len = data.data.length;
+					all_page = data.all_page;
+					for(var i = 0; i < len; i++) {
+						var obj = data.data[i];
+						html += '<div class="single_bag clearfix">';
+						html +='<a href="'+obj['url']+'" class="details">';
+						html += '<img src="'+obj['img']+'" class="bag_cover" /> ';
+						html +='<div class="name">'+obj['name']+'</div>';
+						html += '<span class="price">￥'+obj['price']+'</span>';
+						html += '<span class="particulars">详情</span>';
+						html += '</a></div>';
+					}
+					$('.bag_box').append(html);
+					sessionStorage['bag_box_html'] = $(".bag_box").html();
+					sessionStorage['bag_scroll_top'] = $(".rool_content").scrollTop();
+					currentP = data.p;
+					if(currentP >= data.all_page) {
+						ableLoad = 0;
+						$("#endBox").show();
+						console.log('没有了');
+					}
+					$("#loadingBox").hide();
+					isLoading = 0;
+				}, "json");
+			}
+
+			$(function() {
+				setTimeout(function() {
+					initBox();
+				}, 500);
+			
+				
+				
+				$(".rool_content").scroll(function() {
+					var btnHeight=$(".gift_bag_btn").height();
+					var totalHeight = parseFloat($(".rool_content").height()) + parseFloat($(".rool_content").scrollTop()) - 40; //浏览器的高度加上滚动条的高度
+					var scroolHeight = $(document).height()  -  $(".sc_bottom").height() -40;
+					if(btnHeight!= 'null'){
+						scroolHeight = scroolHeight - btnHeight;
+					}
+					if(  btnHeight  <=  scroolHeight) { //当文档的高度小于或者等于总的高度的时候，开始动态加载数据
+						loadPage();
+						//加载数据
+						console.log('begin load');
+					}
+				});
+			});
+		</script>
+
+	</body>
+
+</html>

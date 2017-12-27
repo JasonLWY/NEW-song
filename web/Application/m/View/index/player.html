@@ -1,0 +1,285 @@
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/swiper.min.css">
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/index.css?version={$version}">
+	</head>
+
+	<body style="visibility:hidden;">
+		<!--顶部轮播图-->
+		<include file="Public:top_banner" />
+		<!--顶部轮播图-->
+
+		<!-- 顶部轮播start -->
+		<php>
+			$vote_flag=1; if($type==1){ if(!$sysInfo['promotion']){ $vote_flag=0; } }
+		</php>
+		<div class="paints swiper-container">
+			<div class="swiper-wrapper">
+				<foreach name="banPlayer" item="item" key="key">
+					<div class="swiper-slide" style="background-image:url({:img($item['pic'],267.18,268)})">
+						<a href="{:U('Index/details',array('player_id'=>$item['player_id'],'type'=>$type))}" class="chref"></a>
+						<switch name="key">
+							<case value="0">
+								<img src="__PUBLIC__/Index/image/silver.png" class="sc_sort">
+							</case>
+							<case value="1">
+								<img src="__PUBLIC__/Index/image/gold.png" class="sc_sort">
+							</case>
+							<case value="2">
+								<img src="__PUBLIC__/Index/image/bronze.png" class="sc_sort third">
+							</case>
+							<default/>
+						</switch>
+						<div class="slide_bottom">
+							<div class="slide_singer">{$item.number} {$item.name}</div>
+							<eq name="type" value="0">
+								<span class="vote_num_{$item.player_id}">{$item['votes']}票</span>
+								<else/>
+								<span class="vote_num_{$item.player_id}">{$item['votes']}票</span>
+								<!-- <span class="vote_num_{$item.player_id}">浏览{$item['seecount']}次</span> -->
+							</eq>
+							<div class="sbot_icon">
+								<input type="hidden" value="{$item.player_id}" />
+								<eq name="vote_flag" value="1">
+									<img class="gift icon_gift" src="__PUBLIC__/Index/image/gift.png" number="{$item.number}" name="{$item.name}" works="{$item.works}" votes="{$item.votes}" pic="{$item.pic}" player_id="{$item.player_id}" />
+									<eq name="item['vflag']" value="1">
+										<img src="__PUBLIC__/Index/image/hearts.png" class="icon_heart player{$item.player_id}">
+										<else/>
+										<img src="__PUBLIC__/Index/image/heart.png" class="icon_heart player{$item.player_id}">
+									</eq>
+								</eq>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+				</foreach>
+			</div>
+			<!-- Add Pagination -->
+			<div class="swiper-pagination"></div>
+		</div>
+		<!-- 顶部轮播end -->
+
+		<!-- 内容列表start -->
+		<div class="sc_content">
+			<div class="sc_box  clearfix"></div>
+			<div class="loadingbox" id="loadingBox" style="display:none">
+				<img src="__PUBLIC__/Index/image/onLoad.gif" />加载中...
+			</div>
+			<div class="loadingbox" id="endBox" style="display:none">
+				加载完了
+			</div>
+			<div class="loading" style="height:0.55rem;"></div>
+		</div>
+		<!-- 内容列表end -->
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 搜索层end -->
+		<!-- 隐藏弹出层-->
+		<include file="Public:gift" />
+		<!--END 隐藏弹出层-->
+	</body>
+	<script src="__PUBLIC__/Index/js/swiper.min.js"></script>
+	<script>
+		var currentP = 0;
+		var keyword = '';
+		var ableLoad = 1;
+		var isLoading = 0; //是否正在加载
+		var all_page = 1;
+		var $click = 0;
+		var vote_flag = "{$vote_flag}";
+		console.log('statrt all_page'+all_page);
+
+		//        window.onload = function(){
+		//            $("body").css("visibility","visible");
+		//        };
+
+		//点击变红心
+		$(".icon_heart").live('click', function() {
+			var index = layer.open({
+				type: 2
+			});
+			var img = $(this);
+			var div = $(this).parent();
+			var player_id = div.find("input").val();
+			var classN = '.player' + player_id;
+			var url = "{:U('Api/vote')}";
+			$.post(url, {
+				player_id: player_id
+			}, function(data) {
+				if(data.status == 1) {
+					$(classN).attr("src", "__PUBLIC__/Index/image/hearts.png");
+					var vote = parseInt(div.prev().html().replace(/票/, "")) + 1;
+					if(vote <= 1000000) {
+						div.prev().html(vote + '票');
+					}
+					sessionStorage['sc_box_html'] = $(".sc_box").html();
+				} else {
+					msg(data.info);
+				}
+				layer.close(index);
+			});
+		});
+
+		function initBox() {
+			var contentHeight = $(window).height() - $(".bo_bg").height() - $(".swiper-container").height() - $(".sc_bottom").height() - 4;
+			$(".sc_content").height(contentHeight);
+			var currentState = history.state;
+			if(currentState) {
+				currentP = currentState.p;
+				all_page = currentState.all_page;
+			}
+			if(currentP == 0) {
+				//currentP=0；表示新页面
+				sessionStorage['sc_box_html'] = '';
+				loadPage();
+			} else {
+				$(".sc_box").html(sessionStorage['sc_box_html']); //转载就业面的HTML
+				$(window).scrollTop(sessionStorage['window_top']); //滚动到旧页面的位置
+				readVoteNum();
+			}
+			$(".sc_load_a").live('click', function() {
+				sessionStorage['window_top'] = $(window).scrollTop(); //记住旧页面的滚动条位置
+			});
+		}
+
+		/**
+		 * lzj:读取上一页的票数，即保证历史列表，也保证数量最新
+		 */
+		function readVoteNum() {
+			var str = sessionStorage['vote_num'];
+			var vflag = sessionStorage['vflag'];
+			console.log(str);
+			if(vflag == 1) {
+				voteNum = JSON.parse(str); //转为对象
+				console.log(voteNum);
+				if(vote_flag == 1) {
+					$(".vote_num_" + voteNum.player_id).text(voteNum.vote + '票');
+					$(".player" + voteNum.player_id).attr('src', "__PUBLIC__/Index/image/hearts.png");
+				} else {
+					$(".vote_num_" + voteNum.player_id).text(voteNum.vote + '票');
+					$(".player" + voteNum.player_id).attr('src', "__PUBLIC__/Index/image/hearts.png");
+					// $(".vote_num_" + voteNum.player_id).text(voteNum.vote + '次');
+				}
+				sessionStorage['vote_num'] = '';
+				sessionStorage['sc_box_html'] = $(".sc_box").html();
+			}
+
+		}
+
+		function loadPage() {
+			history.replaceState({
+				"p": currentP,
+                'all_page':all_page
+			}, "loadPage" + currentP, "#" + currentP); //添加并替换历史纪录
+			if(ableLoad == 0 || isLoading == 1) {
+				//页面加载完了
+				return;
+			}
+			console.log('loading all_page:'+all_page);
+			if(currentP >= all_page) {
+				$("#endBox").show();
+				return;
+			}
+			$("#loadingBox").show();
+			isLoading = 1;
+			var url = "{:U('Api/getPlayer',array('type'=>$type))}"; //查询地址
+			var query = new Object(); //查询参数
+
+			query.p = parseInt(currentP) + 1;
+			query.keyword = keyword;
+			$.post(url, query, function(data) {
+				if(data.status != 1) {
+					msg(data.info);
+					return;
+				}
+				var type = "{$type}";
+				console.log(type);
+				var html = '';
+				var len = data.data.length;
+				all_page = data.all_page;
+				for(var i = 0; i < len; i++) {
+					var obj = data.data[i];
+					html += '<div class="scc_list"> ';
+					html += '<div class="scli_head"> ';
+					html += '<a class="sc_load_a" href="' + obj.url + '">';
+					html += '<img src="' + obj.pic + '"> ';
+					html += '</a>';
+					html += '<div class="schead_title clearfix"> ';
+					html += '<span>' + obj.number + ' ' + obj.name + '</span> ';
+					html += '	<img src="__PUBLIC__/Index/image/play.png"> ';
+					html += '</div></div>';
+					html += '<div class="scli_bottom clearfix"> ';
+					if(type == 0) {
+						html += '<span class="vote_num_' + obj.player_id + '">' + obj.votes + '票</span> '; //lzj:加上选手ID
+					} else {
+						html += '<span class="vote_num_' + obj.player_id + '">' + obj.votes + '票</span> '; //
+						// html += '<span class="vote_num_' + obj.player_id + '">浏览' + obj.seecount + '次</span> '; //lzj:加上选手ID
+					}
+					html += '<div class="scbot_icon clearfix"> ';
+					html += '<input type="hidden" value="' + obj.player_id + '"/>';
+					if(vote_flag==1) {
+						html += '	<img src="__PUBLIC__/Index/image/gift.png" ';
+						html += ' player_id="' + obj.player_id + '" name="' + obj.name + '" works="' + obj.works + '" ';
+						html += ' number="' + obj.number + '" pic="' + obj.pic + '" ';
+						html += ' votes="' + obj.votes + '" ';
+						html += '	class="icon_gift">';
+						if(obj.vflag == 1) {
+							html += '<img src="__PUBLIC__/Index/image/hearts.png" class="icon_heart player' + obj.player_id + '">';
+						} else {
+							html += '<img src="__PUBLIC__/Index/image/heart1.png" class="icon_heart player' + obj.player_id + '">';
+						}
+					}
+					html += '</div> ';
+					html += '</div></div>';
+				}
+				$('.sc_box').append(html);
+				sessionStorage['sc_box_html'] = $(".sc_box").html();
+				sessionStorage['window_top'] = $(window).scrollTop();
+				currentP = data.p;
+				if(currentP >= data.all_page) {
+					ableLoad = 0;
+					$("#endBox").show();
+					console.log('没有了');
+				}
+				$("#loadingBox").hide();
+				isLoading = 0;
+			}, "json");
+		}
+
+		$(function() {
+			setTimeout(function() {
+				initBox();
+			}, 500);
+
+			$(window).scroll(function() {
+				totalHeight = parseFloat($(window).height()) + parseFloat($(window).scrollTop()) - 40; //浏览器的高度加上滚动条的高度
+				if($(document).height() <= totalHeight) { //当文档的高度小于或者等于总的高度的时候，开始动态加载数据
+					loadPage();
+					//加载数据
+					console.log('begin load');
+				}
+			});
+		});
+
+		//轮播图初始化
+		var swiper = new Swiper('.paints', {
+			loop: true,
+			loopAdditionalSlides: 0,
+			pagination: '.swiper-pagination',
+			effect: 'coverflow',
+			centeredSlides: true,
+			slidesPerView: 'auto',
+			initialSlide: 1,
+			coverflow: {
+				rotate: 0,
+				stretch: 50,
+				depth: 200,
+				modifier: 1,
+				slideShadows: true
+			}
+		});
+	</script>
+
+</html>

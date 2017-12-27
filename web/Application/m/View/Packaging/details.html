@@ -1,0 +1,216 @@
+<include file="Public:doctype" />
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/details.css?version={$version}">
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/gift_details.css?version={$version}">
+	</head>
+
+	<body style="visibility:hidden;">
+		<div class="scrool_box">
+			<!--顶部轮播图-->
+			<include file="Public:top_banner" />
+			<!--顶部轮播图-->
+
+			<div class="sc_details_box">
+				<div class="details_content">
+					<div class="gift_bag_details">
+						{$model.content}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="gift_bag_btn">
+			<eq name="sell_out" value="1">
+				<a href="javascript:void(0)" class="my_gift_bag grey" >已售罄</a>
+			<else/> 
+				<a href="javascript:void(0)" class="my_gift_bag" id="click_to_buy">点击购买</a>
+			</eq>
+			
+			<input type="hidden" value="{$model.pack_id}" id="pack_id" />
+		</div>
+
+		<div class="confirm_box" style="display: none;">
+			<div class="confirm_info">
+				<ul>
+					<li>门票名称：{$model.name}</li>
+					<li>门票价格：￥{$model.price}</li>
+					<li>购买数量	：<input type="number" name="amount" maxlength="5" class="gift_bag_input amount" value="1" /></li>
+					<li>使用人姓名：<input type="text" name="user_name" maxlength="20" class="gift_bag_input" /></li>
+					<li>使用人电话：<input type="text" name="user_phone" maxlength="11" class="gift_bag_input" /></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="confirmed_box" style="display: none;">
+			<div class="confirmed_info">
+				<ul>
+					<li>门票名称：{$model.name}</li>
+					<li>门票价格：￥{$model.price}</li>
+					<li class="need_confirm">购买数量：<span id="amount">{$model.amount}</span></li>
+					<li class="need_confirm">使用人姓名：<span id="use_name">张三</span></li>
+					<li class="need_confirm">使用人电话：<span id="use_tel">13223332333</span></li>
+				</ul>
+				<div class="confirm_tip">*请确认数量、使用人姓名和电话无误</div>
+				<div class="gift_bag_btn">
+					<a href="javascript:void(0)" onclick="packaging()" class="my_gift_bag">确认购买</a>
+				</div>
+				<div class="close" onclick="close_layer()">
+					<img src="__PUBLIC__/Index/image/close.png"/>
+				</div>
+			</div>
+		</div>
+
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 底部栏end -->
+
+		<script>
+			var use_name = '';
+			var use_tel = '';
+			var amount='';
+			$(function() {
+				/**
+				 * 按返回事件
+				 */
+				window.addEventListener("popstate", function() {
+					layer.closeAll();
+				});
+				
+				var confirm_html = $(".confirm_info").html();
+				$("#click_to_buy").on("click", function() {
+					var currentState = history.state;
+					var confirmAct = '';
+					if(currentState) {
+						confirmAct = currentState.act;
+					}
+					if(confirmAct == 'confirm') {
+						//如果不是第一次点搜索按钮，就替换历史。避免多次按返回键不关闭搜索弹窗
+						history.replaceState({
+							"act": "confirm"
+						}, "searchpage", "#confirm"); //添加并替换历史纪录
+					} else {
+						history.pushState({
+							"act": "popup"
+						}, "searchpage", "#confirm"); //添加并替换历史纪录
+					}
+					layer.open({
+						content: confirm_html,
+						className: "confirm_info",
+						style: "box-shadow:0 0 0.1rem rgba(0, 0, 0, .5);",
+						shade: 'background-color: rgba(255,255,255,.7)',
+						btn: ['提交', '取消'],
+						yes: function(index) {
+							var flag = check();
+							if(!flag) {
+								return;
+							}
+							layer.close(index);
+							$('#use_name').html(use_name);
+							$('#use_tel').html(use_tel);
+							$('#amount').html(amount);
+							var confirmed_html = $(".confirmed_box").html();
+							layer.open({
+								type: 1,
+								content: confirmed_html,
+								className: "confirmed_info",
+								style: "box-shadow:0 0 0.1rem rgba(0, 0, 0, .5);",
+								shade: 'background-color: rgba(255,255,255,.7)'
+							});
+						},
+						no:function(){
+							layer.closeAll();
+							history.go(-1);
+						}
+					});
+				})
+			})
+
+			//验证姓名和联系电话
+			function check() {
+				use_name = $("input[name='user_name']").last().val().trim();
+				use_tel = $("input[name='user_phone']").last().val().trim();
+				amount = $("input[name='amount']").last().val().trim();
+				var zzs= /^\+?[1-9]\d*$/;
+				if(amount == '' || !zzs.test(amount)){
+					msg('请填写购买数量');
+					return 0;
+				}
+				if(use_name == '' || use_name == null) {
+					msg('使用者姓名不能为空');
+					return 0;
+				}
+				var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+				if(!myreg.test(use_tel)) {
+					msg('请输入正确的手机号码');
+					return 0;
+				}
+				return 1;
+			}
+
+			//购买包装服务
+			function packaging() {
+				var url = "{:U('Api/packaging')}"; //查询地址
+				var query = new Object(); //查询参数
+				query.pack_id = $('#pack_id').val();
+				query.use_name = use_name;
+				query.tel = use_tel;
+				query.amount = amount;
+				var layerIndex = loading('正在处理中...');
+				$.post(url, query, function(data) {
+					closeLayer(layerIndex);
+					if(data.status == 1) {
+						//创建订单成功，发起支付
+						jsApiCall(data.payinfo);
+					} else if(data.status == 2) {
+						//免费门票
+						var url = "{:U('Packaging/mypack')}";
+						hrefTo(url, 500);
+					} else {
+						msg(data.info);
+					}
+				}, "json");
+			}
+
+			//调用微信JS api 支付
+			function jsApiCall(wxpayInfo) {
+				WeixinJSBridge.invoke(
+					'getBrandWCPayRequest',
+					wxpayInfo,
+					// {$jsApiParameters},
+					function(res) {
+						if(res.err_msg.indexOf('ok') > -1) {
+							var url = "{:U('Packaging/mypack',array('type'=>$type))}";
+							hrefTo(url, 500);
+						}
+						if(res.err_msg.indexOf('cancel') > -1) {
+							msg('您取消了支付！');
+						}
+					}
+				);
+			}
+
+			function callpay() {
+				if(typeof WeixinJSBridge == "undefined") {
+					if(document.addEventListener) {
+						document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+					} else if(document.attachEvent) {
+						document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+						document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+					}
+				} else {
+					jsApiCall();
+				}
+			}
+			
+			function close_layer(){
+				layer.closeAll();
+				history.go(-1);
+			}
+		</script>
+
+	</body>
+
+</html>

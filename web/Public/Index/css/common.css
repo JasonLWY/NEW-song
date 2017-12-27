@@ -1,0 +1,74 @@
+@charset "UTF-8";
+* { padding: 0; margin: 0; font-family: "微软雅黑"; -webkit-tap-highlight-color: transparent; }
+
+body { font-size: 0.12rem; background-color: #fff; }
+
+a { text-decoration: none; }
+
+.bo_bg { width: 100%; height: 1.7rem; }
+.bo_bg img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
+
+.flexslider { position: relative; height: 1.7rem; overflow: hidden; width: 100%; }
+.flexslider .slides { position: relative; z-index: 2; height: 1.7rem; }
+.flexslider .slides li { height: 1.7rem; }
+.flexslider .slides li img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
+.flexslider .flex-control-nav { position: absolute; bottom: 0.1rem; z-index: 2; width: 100%; text-align: center; }
+.flexslider .flex-control-nav li { display: inline-block; width: 0.08rem; height: 0.08rem; margin: 0 5px; }
+.flexslider .flex-control-nav a { display: inline-block; width: 0.08rem; height: 0.08rem; line-height: 0.4rem; overflow: hidden; background: url("../image/dot.png") right 0 no-repeat; background-size: cover; cursor: pointer; }
+.flexslider .flex-control-nav .flex-active { background-position: 0 0; }
+
+.clearfix:after { content: " "; display: block; clear: both; height: 0; }
+
+.clearfix { zoom: 1; }
+
+.dis_none { display: none; }
+
+.nowrap { overflow: hidden; -o-text-overflow: ellipsis; /*兼容opera*/ text-overflow: ellipsis; /*这就是省略号喽*/ overflow: hidden; /*设置超过的隐藏*/ white-space: nowrap; /*设置不折行*/ }
+
+.bds_none { border: none; }
+
+.sc_bottom { position: fixed; bottom: 0; background-color: #333; color: #fff; height: 0.49rem; width: 100%; box-sizing: border-box; padding-top: 0.07rem; z-index: 5; }
+.sc_bottom .bot_btn { position: relative; width: 0.6rem; display: block; margin: 0; float: left; text-align: center; line-height: 0.18rem; }
+.sc_bottom .bot_btn a img { width: 0.2rem; height: 0.2rem; display: block; margin: 0 auto; }
+.sc_bottom .bot_btn a span { color: #fff; margin-top: 0.03rem; }
+.sc_bottom .bot_btns { margin: 0; width: 0.8rem; }
+.sc_bottom .bot_btns .bot_search { box-sizing: border-box; background-color: #fff; width: 0.6rem; height: 0.6rem; border-radius: 0.5rem; margin: 0 auto; margin-top: -0.171rem; padding-top: 0.06rem; border: 0.06rem solid #333; color: #333; text-align: center; }
+.sc_bottom .bot_btns .bot_search img { width: 0.2rem; height: 0.2rem; display: block; margin: 0 auto; }
+
+.search_side { display: none; position: fixed; top: 0; width: 100%; height: 5.2rem; background-color: rgba(255, 255, 255, 0.75); z-index: 4; }
+.search_side .search_con { position: relative; width: 80%; margin: 0 auto; }
+.search_side .search_close { position: absolute; top: 0.15rem; right: 0.2rem; font-size: 0.18rem; }
+.search_side .search_fram { display: block; width: 2.6rem; height: 0.28rem; margin-top: 30%; margin-bottom: 0.05rem; border-radius: 0.1rem; background-color: #c9c8c8; color: #333; border: none; border-top-style: inset; text-indent: 0.1rem; }
+.search_side input::-webkit-input-placeholder { /*WebKit browsers*/ color: #5e5e5e; padding-left: 0.1rem; }
+.search_side span { font-size: 0.12rem; color: #666; margin-left: 18%; }
+.search_side .sub_btn { position: absolute; top: 0.05rem; right: 0.1rem; width: 0.18rem; height: 0.18rem; background: url("../image/search.png") no-repeat center; background-size: 100% 100%; border: none; -webkit-tap-highlight-color: transparent; }
+
+.gift_content { box-sizing: border-box; width: 100%; background-color: #eee; border: 0.01rem solid #ddd; height: 3rem; background-image: url("../image/paybg.png"); background-repeat: no-repeat; background-size: cover; border: none; border-top-left-radius: 0.04rem; border-top-right-radius: 0.04rem; }
+.gift_content .gift_close { text-align: right; padding-right: 0.13rem; padding-top: 0.12rem; color: #fff; font-size: 0.2rem; font-family: thin; }
+.gift_content .list_con { width: 2rem; height: 2.6rem; overflow: auto; margin: 0 auto; }
+.gift_content .list_con .gift_list { width: 2rem; margin: 0.09rem auto; border-bottom: 0.01rem dashed #fff; padding-bottom: 0.09rem; }
+.gift_content .list_con .gift_list .gift_paint { float: left; width: 1rem; height: 0.6rem; }
+.gift_content .list_con .gift_list .gift_paint img { display: block; width: 0.6rem; height: 0.4rem; margin: 0 auto; }
+.gift_content .list_con .gift_list .gift_paint .gift_name { text-align: center; font-size: 0.12rem; color: #f3f4e8; width: 1.2rem; margin: 0 auto; position: relative; left: -0.16rem; }
+.gift_content .list_con .gift_list .gift_count { float: left; width: 1rem; text-align: center; margin-top: 0.04rem; }
+.gift_content .list_con .gift_list .gift_count .gift_price { color: #fff; font-size: 0.14rem; font-weight: bold; text-shadow: 0 0 0.12rem #000; margin-bottom: 0.03rem; }
+.gift_content .list_con .gift_list .gift_count .gift_sum { position: relative; width: 0.5rem; margin: 0 auto; border-top: 0.02rem solid #f2f7ef; border-bottom: 0.02rem solid #f5e2a9; color: #fff; font-size: 0.12rem; background-color: #a27628; line-height: 0.16rem; }
+.gift_content .list_con .gift_list .gift_count .gift_sum img { width: 0.3rem; height: 0.3rem; position: absolute; top: -0.06rem; }
+.gift_content .list_con .gift_list .gift_count .gift_sum .icon_sub { left: -0.23rem; }
+.gift_content .list_con .gift_list .gift_count .gift_sum .icon_add { right: -0.23rem; }
+
+.gift_bottom { width: 100%; height: 0.3rem; box-sizing: border-box; padding: 0.06rem 0.16rem; text-align: right; }
+.gift_bottom .prop_sum { color: #101010; line-height: 0.3rem; border-bottom: 0.01rem solid #989898; font-weight: bolder; }
+.gift_bottom .prop_sum label { font-weight: 100; color: #d52727; }
+.gift_bottom .gift_btn { float: right; background: linear-gradient(#fff, #cfcfcf); color: #515151; width: 0.6rem; text-align: center; border-radius: 0.05rem; margin-top: 0.05rem; }
+
+.vote_tip { position: fixed; top: 1.5rem; left: 0; background: url("../image/vote_tip.png") no-repeat center; background-size: cover; width: 2.8rem; height: 2.1rem; z-index: 99; }
+.vote_tip .tip_content { width: 1.3rem; font-size: 0.18rem; margin-top: 1.3rem; margin-left: 1rem; text-align: center; }
+
+.confirm_to_lottery { width: 2.76rem; height: 2rem; text-align: center; border: 1px solid #ffa200; border-radius: 0.1rem; background: #FFFFFF; opacity: 0.9; }
+.confirm_to_lottery .right_now { color: #ff6000; font-size: 0.24rem; line-height: 0.3rem; padding: 0.4rem 0; }
+.confirm_to_lottery .lottery_url { margin: 0 auto; width: 90%; display: block; color: #fff; background-image: -webkit-gradient(linear, left top, left bottom, from(#ffa200), to(#ffa200)); height: 0.44rem; line-height: 0.44rem; border-radius: 0.03rem; font-size: 0.17rem; }
+.confirm_to_lottery .lottery_url a { color: #FFFFFF; }
+.confirm_to_lottery .close { position: absolute; top: 0; right: 0.03rem; cursor: pointer; }
+
+/*# sourceMappingURL=common.css.map */

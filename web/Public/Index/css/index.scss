@@ -1,0 +1,201 @@
+.paints{
+	width: 90%;
+    height: 1.3rem;
+    // top: 1rem;
+//  margin-top: -0.45rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.27rem;
+    // position: fixed;
+    margin-left: 0.17rem;
+    border-bottom: 0.01rem solid #191919;
+	.swiper-slide{
+		background-position: center;
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        width: 45%;
+        height: 100%;
+        border: 0.02rem solid #fff;
+        box-shadow: 0 0 0.1rem #888888;
+        position: relative;
+        .chref{
+        	display: block;
+        	width: 100%;
+        	height: 1.06rem;
+        	position: absolute;
+        	top: 0;
+        	cursor: pointer;
+        }
+
+        .slide_bottom{
+        	box-sizing: border-box;
+	    	width: 100%;
+	    	position: absolute;
+	    	bottom: 0;
+	    	color: #ff4f38;
+	    	background-color: rgba(51,51,51,.75);
+	    	padding: 0 0.03rem;
+	    	padding-top: 0.03rem;
+	    	span{
+		    	display: block;
+			    float: left;
+			    width: 0.8rem;
+			    white-space: nowrap;
+			    text-overflow: ellipsis;
+			    overflow: hidden;		    	
+		    }
+		    .sbot_icon{
+		    	float: right;
+		    	img{
+		    		cursor: pointer;
+		    		width: 0.2rem;
+    				height: 0.2rem;
+		    	}
+		    }
+		    .slide_singer{
+	        	float: left;
+			    width: 100%;
+			    white-space: nowrap;
+			    text-overflow: ellipsis;
+			    overflow: hidden;
+	        }
+	    }
+	    .sc_sort{
+	    	position: absolute;
+	    	width: 0.45rem;
+	    	height: 0.6rem;
+	    	left: -0.13rem;
+	    	top: -0.16rem;
+	    }
+	    .third{
+	        left:1rem;
+	    }
+	}
+}
+
+.sc_content{
+	// background-color: lightblue;
+	// position: absolute;
+	width: 100%;
+	height: 1.64rem;
+	margin: 0 auto;
+	padding-bottom: 0.08rem;
+	// overflow: auto;
+	// padding-left: 0.08rem;
+	box-sizing: border-box;
+	// bottom: 0.52rem;
+	.loadingbox{
+		font-size:0.12rem;
+		text-align:center;
+		color:#999;
+		padding:0.1rem 0;
+		line-height:0.16rem;
+		img{
+			position:relative;
+			top:0.03rem;
+			margin-right:0.05rem;
+		}
+	}
+	// text-align: center;
+	.sc_box{
+		// padding:0 0.1rem;
+		width:2.88rem;
+		margin:0 auto;
+		
+	}
+	.scc_list{
+		// display: inline-block;
+		// display:block;
+		float:left;
+		width: 1.37rem;
+		height: 1.5rem;
+		background-color: #edeaea;
+		margin-top: 0.13rem;
+		// margin-left: 0.16rem;
+		&:nth-child(even){
+			margin-left:0.14rem;
+		}
+		.scli_head{
+			box-sizing: border-box;
+			padding: 0.05rem;
+			position: relative;
+			width: 100%;
+			height: 1.27rem;
+			img{
+				width: 100%;
+				height: 100%;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			.schead_title{
+				background-color: rgba(0,0,0,0.5);
+				width: 93%;
+				position: absolute;
+				bottom: 0.05rem;
+				color: #fff;
+				span{
+					font-size: 0.12rem;
+				    color: #fff;
+				    float: left;
+				    margin-left: 0.04rem;
+				    display: block;
+				    width: 1rem;
+				    text-overflow: ellipsis;
+				    white-space: nowrap;
+				    overflow: hidden;
+				}
+				img{
+					float: right;
+					width: 0.07rem;
+					height: 0.07rem;
+					margin-top: 0.02rem;
+					margin-right: 0.05rem;
+				}
+			}
+		}
+		.scli_bottom{
+			box-sizing: border-box;
+			border-top: 0.01rem solid #eee;
+			width: 100%;
+			padding: 0 0.05rem;
+			line-height: 0.2rem;
+			span{
+				color: #ff4f38;
+				float: left;
+				padding-right: 0.05rem;
+			}
+			.scbot_icon{
+				float: right;
+				margin-top: 0.03rem;
+				.icon_gift{
+					width: 0.25rem;
+					height: 0.25rem;
+					margin-right: 0.04rem;
+					margin-top: -0.08rem;
+					float: left;
+					// margin-top: 0.04rem;
+				}
+				img{
+					cursor: pointer;
+					width: 0.16rem;
+					height: 0.16rem;
+					margin-top: -0.03rem;
+				}
+			}
+		}
+	}
+}
+
+.search_res{
+    margin-left: 0.2rem;
+    .keyword{
+        color:#d53331;
+    }
+}
+
+.auto_load{
+    overflow: auto;
+}
+
+.bds_none{
+  border:none;
+}

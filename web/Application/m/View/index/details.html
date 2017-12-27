@@ -1,0 +1,292 @@
+<include file="Public:doctype" />
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/details.css?version={$version}">
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/index/css/swiper.min.css">
+	</head>
+
+	<body style="visibility:hidden;">
+		<!--顶部轮播图-->
+		<include file="Public:top_banner" />
+		<!--顶部轮播图-->
+
+        <php>
+            $vote_flag=1;
+	            if($type==1){
+		            if(!$sysInfo['promotion']){
+		            $vote_flag=0;
+		            }
+            }
+        </php>
+
+		<div class="sc_details_box">
+			<div class="details_content">
+                <notempty name="model['works_video']">
+                    <div id="video_box">
+                        <div id="video">
+                            <eq name="model.video_type" value="1">
+                                <video id="video1" style="width: 2.4rem;height: 1.38rem;" controls>
+                                    <source src="{$model['works_video']}" type="video/mp4">
+                                </video>
+                                <else />{$model['works_video']}
+                                <script>
+                                    $(function() {
+                                        //get iframe object
+                                        var iframeArr = $("iframe");
+                                        var iframeObj = $(iframeArr[0]);
+                                        iframeObj.removeAttr('width').removeAttr('height').css({
+                                            'width': '2.4rem',
+                                            'height': '1.38rem'
+                                        });
+                                    });
+                                </script>
+                            </eq>
+                        </div>
+                    </div>
+                </notempty>
+				<div class="player_info">
+					<span class="number">{$model.number}号选手</span>
+					<span class="name">{$model.name}</span>
+                    <notempty name="model.works">
+                        <span class="works"> 作品：《{$model.works}》</span>
+                    </notempty>
+				</div>
+				<div class="vote_info">
+					<input type="hidden" value="{$model.player_id}" />
+                    <eq name="type" value="0">
+                        <span class="total">{$model.votes}票</span>
+                    <else/>
+                    	<span class="total">{$model.votes}票</span>
+                        <!-- <span class="total">浏览{$model.seecount}次</span> -->
+                    </eq>
+                    <eq name="vote_flag" value="1">
+                        <img class="gift icon_gift" src="__PUBLIC__/Index/image/gift.png" number="{$model.number}" name="{$model.name}" works="{$model.works}" votes="{$model.votes}" pic="{$model.pic}" player_id="{$model.player_id}" />
+                        <eq name="model['vflag']" value="1">
+                            <img src="__PUBLIC__/Index/image/hearts.png" class="icon_heart">
+                            <else/>
+                            <img src="__PUBLIC__/Index/image/heart.png" class="icon_heart">
+                        </eq>
+                    </eq>
+				</div>
+				<!--新增礼物数量-->
+                <eq name="vote_flag" value="1">
+                    <div class="gift_info">
+                        <foreach name="gift" item="item">
+                            <span class="name">{$item.name}(+{$item.poll}票) * {$item.count|default=0}</span>
+                        </foreach>
+                    </div>
+                </eq>
+				<!--新增礼物数量-->
+				<div class="intro">
+					{$model.content}
+				</div>
+				<hr style="margin-top: 0.2rem;" />
+					<div class="vote_record"> 
+						<div class="vote_record_box">
+							
+						</div>
+						<div class="loadingbox" id="loadingBox" style="display:none">
+							<img src="__PUBLIC__/Index/image/onLoad.gif" />加载中...
+						</div>
+						<div class="loadingbox" id="endBox" style="display:none">
+							加载完了
+						</div>
+					</div>
+			</div>
+		</div>
+
+		<!-- 广告轮播start -->
+		<php>
+			$tag="model_id:2;cid:3;is_show:1;pageSize:4"; $img_list=yc_get_list($tag);
+		</php>
+		<!-- 内页广告轮播start -->
+		<div class="flexslider_ad">
+			<ul class="slides">
+				<foreach name="img_list['list']" item="item">
+					<li>
+                        <empty name="item['link_url']">
+                            <a href="{:U('Index/ad',array('aid'=>$item['aid'],'type'=>$type))}"><img src="{$item['pic'][0]['path']}" /></a>
+                            <else/>
+                            <a href="{$item.link_url}"><img src="{$item['pic'][0]['path']}" /></a>
+                        </empty>
+					</li>
+				</foreach>
+			</ul>
+		</div>
+		<!-- 内页广告轮播end -->
+		<div style="height:0.6rem"></div>
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 底部栏end -->
+		<!-- 礼物列表start -->
+		<include file="Public:gift" />
+		<!-- 礼物列表end -->
+		<script src="__PUBLIC__/Index/js/swiper.min.js"></script>
+		<script>
+			var currentP = 0; //当前页
+			var ableLoad = 1; //能否加载，1为能
+			var isLoading = 0; //是否正在加载
+			var all_page = 1;
+			var vflag="{$model['vflag']}";//判断是否已经投票
+            var vote_flag="{$vote_flag}";
+
+			function initBox() {
+				var currentState = history.state; //添加当前记录
+				if(currentState) {
+					currentP = currentState.p;
+				}
+				if(currentP == 0) {
+					sessionStorage['record_box_html'] = '';
+					loadPage();
+				} else {
+					$(".vote_record_box").html(sessionStorage['record_box_html']); //装载旧业面的HTML
+					$(".vote_record").scrollTop(sessionStorage['sc_scroll_top']); //滚动到旧页面的位置
+				}
+				$(".sc_load_a").live('click', function() {
+					sessionStorage['sc_scroll_top'] = $(".vote_record").scrollTop(); //记住旧页面的滚动条位置
+				});
+			}
+
+			function loadPage() {
+				history.replaceState({
+					"p": currentP
+				}, "loadPage" + currentP, "#" + currentP); //添加并替换历史纪录
+				if(ableLoad == 0 || isLoading == 1) {
+					//页面加载完了
+					return;
+				}
+				if(currentP >= all_page) {
+					$("#endBox").show();
+					return;
+				}
+				$("#loadingBox").show();
+				isLoading = 1;
+				var url = "{:U('api/getVote')}"; //查询地址
+				var query = new Object(); //查询参数
+				query.p = parseInt(currentP) + 1;
+				query.player_id = "{$player_id}";
+				query.round_id = "{$round_id}";
+				$.post(url, query, function(data) {
+					var html = '';
+					var len = data.data.length;
+					if(len==0){
+						$('.vote_record').hide();
+					}
+					all_page = data.all_page;
+					for(var i = 0; i < len; i++) {
+						var obj = data.data[i];
+						html += '<div class="single_vote">';
+						html += '<img src="'+obj.headimgurl+'" /> ';
+						html += '<div class="name">'+obj.nickname+'</div>';
+						html += '<div class="date">'+obj.vote_time+'</div>';
+						if(obj.type=="gift"){
+							html += '<div class="act">赠送了'+obj.gift_name+'*'+obj.amount+'</div>'
+						}else{
+							html += '<div class="act">投了一票</div>'
+						}
+						html += '</div>';
+					}
+					$('.vote_record_box').append(html);
+					sessionStorage['record_box_html'] = $(".vote_record_box").html();
+					sessionStorage['sc_scroll_top'] = $(".vote_record").scrollTop();
+					currentP = data.p;
+					if(currentP >= data.all_page) {
+						ableLoad = 0;
+						$("#endBox").show();
+						console.log('没有了');
+					}
+					$("#loadingBox").hide();
+					isLoading = 0;
+				}, "json");
+			}
+
+			$(function() {
+				setTimeout(function() {
+					initBox();
+					setListVoteNum();
+				}, 500);
+
+				$(".vote_record").scroll(function() {
+					var scrolltop = $(this).scrollTop();
+					var scrollheight = $(this).height();
+					var boxheight = $(".vote_record_box").height();
+					var paddingHeight = 10;
+					totalheight = parseFloat(scrollheight) + parseFloat(scrolltop) + paddingHeight;
+
+					//浏览器的高度加上滚动条的高度
+					if(boxheight <= totalheight) //当文档的高度小于或者等于总的高度的时候，开始动态加载数据
+					{
+						loadPage();
+						//加载数据
+						console.log('begin load');
+					}
+				});
+			});
+		</script>
+
+		<script>
+
+			//lzj:设置列表页的票数
+			function setListVoteNum(){
+				var voteNum=new Object();
+				voteNum.player_id=parseInt("{$model.player_id}");//选手号
+				var votes = $('.total');
+                sessionStorage['vflag']=vflag;
+                if(vote_flag==1){
+                    voteNum.vote=parseInt(votes.html().replace(/票/, "")) ;//票数
+                }else{
+                    voteNum.vote=parseInt(votes.html().replace(/次/, "")) ;//票数
+                    voteNum.vote=parseInt(votes.html().replace(/浏览/, "")) ;//票数
+                    sessionStorage['vflag']=1;
+                }
+                jsonStr=JSON.stringify(voteNum);//将结果存为字符串
+                sessionStorage['vote_num']=jsonStr;
+			}
+
+			// 广告轮播
+			var swiper = new Swiper('.swiper-container', {
+				loop: true,
+				autoplay: 8000,
+			});
+			//点击变红心
+			$(".icon_heart").live('click', function() {
+				var index = layer.open({
+					type: 2
+				});
+				var img = $(this);
+				var div = $(this).parent();
+				var player_id = div.find("input").val();
+				var votes = div.find('.total');
+				var url = "{:U('Api/vote')}";
+				$.post(url, {
+					player_id: player_id
+				}, function(data) {
+					if(data.status == 1) {
+						img.attr("src", "__PUBLIC__/Index/image/hearts.png");
+						var vote = parseInt(votes.html().replace(/票/, "")) + 1;
+						votes.html(vote + '票');
+						vflag=1;
+						setListVoteNum();
+					} else {
+						msg(data.info);
+					}
+					layer.close(index);
+				});
+			});
+
+			//广告轮播
+			$(document).ready(function() {
+				$('.flexslider_ad').flexslider({
+					animation: "slide",
+					directionNav: false,
+					pauseOnAction: false,
+					slideshowSpeed: 5000,
+				});
+			});
+		</script>
+
+	</body>
+
+</html>

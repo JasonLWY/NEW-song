@@ -1,0 +1,256 @@
+<include file="Public:doctype" />
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/gift.css?version={$version}">
+	</head>
+
+	<body style="visibility:hidden;">
+		<!--顶部轮播图-->
+		<include file="Public:top_banner" />
+		<!--顶部轮播图-->
+
+		<div class="sc_gift_box">
+			<div class="gift_bag_title">
+				<div class="my_left_orn"></div>
+				<span>我的门票</span>
+				<div class="my_right_orn"></div>
+			</div>
+			
+			<div class="pattern">
+				<span class="item">决赛时间：</span>2017年4月30号，一点开始<br/>
+				<span class="item">地址：</span>鑫金汇智汇小镇4楼路演中心。<br/>
+			</div>
+
+			<div class="my_bag_list">
+				<div class="my_bag_box"></div>
+				<div class="loadingbox" id="loadingBox" style="display:none">
+					<img src="__PUBLIC__/Index/image/onLoad.gif" />加载中...
+				</div>
+				<div class="loadingbox" id="endBox" style="display:none">
+					加载完了
+				</div>
+				<div class="loading" style="height:0.55rem;"></div>
+			</div>
+		</div>
+		
+		
+		<div class="confirm_box" style="display: none;">
+			<div class="confirm_info">
+				<ul>
+					<li>订单号：<span id="out_trade_no">123456789</span></li>
+					<li>数量：<span id="amount"></span></li>
+					<li>使用人姓名：<span id="use_name">张三</span></li>
+					<li>使用人电话：<span id="use_tel">13222223333</span></li>
+					<li>购买时间：<span id="addtime">03-03 23:30</span></li>
+					<li>订单状态：<span class="status" id="status">已支付</span></li>
+					<li class="ticket">兑票码：
+						<input type="hidden" id="pack_log_id" value=""/>
+						<input type="text" name="psw" id="psw" maxlength="11" class="gift_bag_input" />
+					</li>
+				</ul>
+				<div class="gift_bag_btn">
+					<a href="javascript:void(0)"  class="my_gift_bag redden">兑奖</a>
+				</div>
+				<div class="close" onclick="close_layer()">
+					<img src="__PUBLIC__/Index/image/close.png"/>
+				</div>
+			</div>
+		</div>
+
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 底部栏end -->
+		
+		<script type="text/javascript" src="__PUBLIC__/Index/js/overTexts.js"></script>
+		<script>
+			var currentP = 0; //当前页
+			var keyword = ''; //关键词
+			var ableLoad = 1; //能否加载，1为能
+			var isLoading = 0; //是否正在加载
+			var all_page = 1;
+
+			function initBox() {
+				var contentHeight = $(window).height() - $(".flexslider").height() - $(".gift_bag_title").height() - $(".sc_bottom").height() - 25;
+				$('.my_bag_list').height(contentHeight);
+				var currentState = history.state; //添加当前记录
+				if(currentState) {
+					currentP = currentState.p;
+				}
+				if(currentP == 0) {
+					sessionStorage['my_bag_box_html'] = '';
+					loadPage();
+				} else {
+					$(".my_bag_box").html(sessionStorage['my_bag_box_html']); //装载旧业面的HTML
+					$(window).scrollTop(sessionStorage['my_bag_scroll_top']); //滚动到旧页面的位置
+				}
+				$(".details").live('click', function() {
+					sessionStorage['my_bag_scroll_top'] = $(window).scrollTop(); //记住旧页面的滚动条位置
+				});
+			}
+
+			function loadPage() {
+				history.replaceState({
+					"p": currentP
+				}, "loadPage" + currentP, "#" + currentP); //添加并替换历史纪录
+				if(ableLoad == 0 || isLoading == 1) {
+					//页面加载完了
+					return;
+				}
+				if(currentP >= all_page) {
+					$("#endBox").show();
+					return;
+				}
+				$("#loadingBox").show();
+				isLoading = 1;
+				var url = "{:U('Api/myPack')}"; //查询地址
+				var query = new Object(); //查询参数
+				query.p = parseInt(currentP) + 1;
+				query.keyword = keyword;
+				$.post(url, query, function(data) {
+					console.log(data);
+					var html = '';
+					var len = data.data.length;
+					all_page = data.all_page;
+					for(var i = 0; i < len; i++) {
+						var obj = data.data[i];
+                        html +='<div class="bought_bag clearfix" style="cursor: pointer;">';
+                        html +='<div class="name">'+obj['name']+'</div>';
+                        html +='<div class="clearfix">';
+                        html +='<img src="'+obj['img']+'" class="bag_cover" />';
+                        html +='<div class="sub">'+obj['description']+'</div>';
+                        html +='</div>';
+                        html +='<div class="price">订单金额：￥'+obj['total_fee']+'</div>';
+                        html +='<div class="quantity">数量：'+obj['amount']+'</div>';
+                        html +='<span class="details" pack_log_id="'+obj['pack_log_id']+'" amount="'+obj['amount']+'" out_trade_no="'+obj['use_code']+'" tel="'+obj['tel']+'" use_name="'+obj['use_name']+'" is_convert="'+obj['is_convert']+'" addtime="'+obj['addtime']+'">详情</span>';
+                        html +='</div>';
+                        html +='<hr class="dot_line"/>';
+					}
+					$('.my_bag_box').append(html);
+					cut_sub();
+					sessionStorage['my_bag_box_html'] = $(".my_bag_box").html();
+					sessionStorage['my_bag_scroll_top'] = $(window).scrollTop();
+					currentP = data.p;
+					if(currentP >= data.all_page) {
+						ableLoad = 0;
+						$("#endBox").show();
+						console.log('没有了');
+					}
+					$("#loadingBox").hide();
+					isLoading = 0;
+				}, "json");
+			}
+			
+			function cut_sub(){
+				$(".sub").each(function(){
+					var textStr=$(this).text();
+					$(this).overTexts({
+						texts: textStr,
+						textLength: "55",
+						overText: "展开",
+						openText: "收起",
+						ooType: "3"
+					});
+				});
+			}
+			
+			
+			function close_layer(){
+				layer.closeAll();
+				history.go(-1);
+			}
+
+			$(function() {
+				/**
+				 * 按返回事件
+				 */
+				window.addEventListener("popstate", function() {
+					layer.closeAll();
+				});
+				
+				setTimeout(function() {
+					initBox();
+				}, 500);
+				
+				$(window).scroll(function() {
+					totalHeight = parseFloat($(window).height()) + parseFloat($(window).scrollTop()) - 40; //浏览器的高度加上滚动条的高度
+					var scroolHeight = $(document).height() - $(".sc_bottom").height() -40;
+					if(scroolHeight <= totalHeight) { //当文档的高度小于或者等于总的高度的时候，开始动态加载数据
+						loadPage();
+						cut_sub();
+						//加载数据
+						console.log('begin load');
+					}
+				});
+				
+				$(".bought_bag").live("click", function() {
+                    var details=$(this).find('.details');
+                    $('#out_trade_no').html(details.attr('out_trade_no'));
+                    $('#use_tel').html(details.attr('tel'));
+                    $('#use_name').html(details.attr('use_name'));
+                    $('#addtime').html(details.attr('addtime'));
+                    $('#amount').html(details.attr('amount'));
+                    if(details.attr('is_convert')==1){
+                    	$("#status").html('已兑换');
+                    	$(".gift_bag_btn").hide();
+                    	$(".ticket").hide();
+                    }
+                    var html = $(".confirm_box").html();
+					var currentState = history.state;
+					var searchAct = '';
+					if(currentState) {
+						searchAct = currentState.act;
+					}
+					if(searchAct == 'popup') {
+						//如果不是第一次点搜索按钮，就替换历史。避免多次按返回键不关闭搜索弹窗
+						history.replaceState({
+							"act": "popup"
+						}, "searchpage", "#popup"); //添加并替换历史纪录
+					} else {
+						history.pushState({
+							"act": "popup"
+						}, "searchpage", "#popup"); //添加并替换历史纪录
+					}
+					layer.open({
+						type: 1,
+						content: html,
+						className: "confirm_info",
+						style:"box-shadow:0 0 0.1rem rgba(0, 0, 0, .5);",
+						shade: 'background-color: rgba(255,255,255,.7)'
+					});
+				})
+				
+
+				$('.redden').live("click",function(){
+					$(".confirm_box").remove();
+					var details=$(".bought_bag").find('.details');
+					var pack_log_id = details.attr('pack_log_id');
+					var psw = $("#psw").val();
+					var url="{:U('Packaging/redden')}";
+					var query=new Object();
+					query.psw=psw;
+					query.pack_log_id=pack_log_id;
+					$.ajax({
+						type: "post",
+						data: query,
+						url: url,
+						datatype: "json",
+						success: function(data) {
+							msg(data.info);
+							$(".status").text("已兑换");
+							if(data.url) {
+								hrefTo(data.url);
+							} else {
+								msg(data.info);
+							}
+						}
+					});
+				})
+				
+			});
+		</script>
+
+	</body>
+
+</html>

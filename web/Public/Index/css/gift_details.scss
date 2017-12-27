@@ -1,0 +1,143 @@
+.scrool_box{
+    max-height: 4rem;
+    min-height:2.5rem;
+    overflow: auto;
+}
+
+.layermbtn{
+    position: relative;
+    height: 0.4rem;
+    line-height: 0.4rem;
+    font-size: 0;
+    text-align: center;
+    border-top: 1px solid #EBEBEB;
+    &:before{
+        content: '\20';
+        position: absolute;
+        width: 0.01rem;
+        height: 0.4rem;
+        left: 50%;
+        top: 0;
+        background-color: #EBEBEB;
+    }
+    
+    span:first-child{
+        height: 0.4rem;
+    }
+    span{
+        width: 50%;
+        text-align: center;
+        font-size: 0.14rem;
+        cursor: pointer;
+        border-radius: 0 0.03rem 0 0;
+    }
+}
+
+.sc_details_box {
+    .details_content {
+        .gift_bag_details {
+            margin: 0 auto;
+            img{
+                max-width: 2.61rem !important;
+                margin: 0.2rem 0.14rem !important;
+                box-shadow:0 0 0.1rem rgba(0, 0, 0, .5) !important;
+            }
+            .gift_det {
+                text-align: center;
+                font-size: 0.09rem;
+                color: #ac8b35;
+                margin-top: 0.2rem;
+            }
+        }
+    }
+}
+
+.gift_bag_btn {
+    .my_gift_bag {
+        display: block;
+        margin: 0.09rem auto;
+        width: 1.12rem;
+        height: 0.35rem;
+        line-height: 0.3rem;
+        font-weight: 600;
+        color: #ecca29;
+        font-size: 0.16rem;
+        text-align: center;
+        background: url("../image/gift_btn.png") no-repeat center;
+        background-size: 100% 100%;
+        cursor: pointer;
+    }
+}
+
+.confirm_info{
+    width:2.54rem;
+    height:3.14rem;
+    ul{
+        list-style:none;
+        margin-top: 0.14rem;
+        li{
+            padding:0.14rem 0;
+            font-size: 0.15rem;
+            color:#50504f;
+            margin-left: 0.07rem;
+            text-indent: 0.1rem;
+            .gift_bag_input{
+                width:1.26rem;
+                height: 0.23rem;
+                line-height: 0.23rem;
+                text-indent: 0.05rem;
+            }
+            .amount{
+                width:0.6rem;
+            }
+        }
+    }
+}
+
+.layermcont{
+    padding:0;
+    text-align: left;
+}
+
+.confirmed_info{
+    width:2.44rem;
+    height: 3.14rem;
+    ul{
+        list-style:none;
+        margin-top: 0.14rem;
+         .need_confirm{
+            color:#ff0000;
+        }
+        li{
+            padding:0.14rem 0;
+            font-size: 0.15rem;
+            color:#50504f;
+            margin-left: 0.3rem;
+            .gift_bag_input{
+                width:1.26rem;
+                height: 0.23rem;
+                line-height: 0.23rem;
+                text-indent: 0.05rem;
+            }
+        }
+    }
+   .confirm_tip{
+        font-size:0.1rem;
+        text-align: center;
+        margin-top: -0.1rem;
+        color:#ff0000;
+        font-weight: 600;
+    }
+    .close{
+        position: absolute;
+        top: 0;
+        right: 0.03rem;
+        cursor: pointer;
+    }
+}
+
+.grey{
+    background:#bababa !important;
+    color:#333 !important;
+    border-radius: 0.5rem;
+}

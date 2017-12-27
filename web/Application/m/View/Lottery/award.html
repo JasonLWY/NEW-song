@@ -1,0 +1,120 @@
+<include file="Public:doctype" />
+<html>
+
+	<head>
+		<include file="Public:baseHead" />
+		<link rel="stylesheet" type="text/css" href="__PUBLIC__/Index/css/award.css?version={$version}">
+	</head>
+
+	<body style="visibility:hidden;">
+
+		<div class="prize_box">
+			<div class="header">我的奖品</div>
+			<div class="pattern">
+				<span class="item">兑奖方式：</span>凡在网络投票达到以上条件者，网络投票后台会自动设置参加抽奖，中奖者可凭获奖信息到《中国新歌声》韶关组委会办公点领取。<br/>
+				<span class="item">地址：</span>韶关浈江区站南路69号口岸大厦4楼。<br/>
+				<span class="item">联系电话：</span>0751——8205266
+			</div>
+			<div class="prize_list">
+				<foreach name="myList" item="item" key="key">
+					<div class="single_prize clearfix">
+						<div class="prize_pic"><img src="{$item.cp_img}" /></div>
+						<div class="info">
+							<div class="item">[{$item.cp_name}] {$item.cp_goods}</div>
+							<div class="code">中奖号码：{$item.sn}</div>
+							<div class="time">中奖时间：{$item.addtime|date="Y-m-d",###}</div>
+						</div>
+						<eq name="item.is_use" value="1">
+							<div class="redden grey">已兑奖</div>
+							<else/>
+							<div class="redden">点击兑奖</div>
+						</eq>
+						<input type="hidden" name="sn" value="{$item.sn}" />
+					</div>
+				</foreach>
+			</div>
+		</div>
+		<div style="height: 0.5rem;"></div>
+
+		<div class="redden_box" style="display: none;">
+			<div class="redden_info">
+				<div class="tips">请输入兑奖码：</div>
+				<input type="hidden" id="sn" />
+				<input type="password" name="" id="psw" value="" class=" redden_psw" />
+			</div>
+		</div>
+
+		<!-- 底部栏start -->
+		<include file="Public:bottom" />
+		<!-- 底部栏end -->
+
+		<script>
+			$(function() {
+				/**
+				 * 按返回事件
+				 */
+				window.addEventListener("popstate", function() {
+					layer.closeAll();
+				});
+			})
+
+			var redden_html = $(".redden_box").html();
+			$(".redden_box").remove();
+			$(".redden").click(function() {
+				if($(this).hasClass('grey')) {
+					return false;
+				}
+				var currentState = history.state;
+				var confirmAct = '';
+				if(currentState) {
+					confirmAct = currentState.act;
+				}
+				if(confirmAct == 'redden') {
+					//如果不是第一次点搜索按钮，就替换历史。避免多次按返回键不关闭搜索弹窗
+					history.replaceState({
+						"act": "redden"
+					}, "searchpage", "#redden"); //添加并替换历史纪录
+				} else {
+					history.pushState({
+						"act": "redden"
+					}, "searchpage", "#redden"); //添加并替换历史纪录
+				}
+
+				var sns=$(this).next().val();
+				layer.open({
+					content: redden_html,
+					className: "redden_info",
+					style: 'width:2.2rem',
+					shade: 'background-color: rgba(255,255,255,.7)',
+					btn: ['兑奖', '取消'],
+					yes: function(index) {
+						var sn = sns;
+						var psw = $('#psw').val();
+						console.log(sn);
+						var url = "{:U('Lottery/redden')}";
+						$.ajax({
+							type: "post",
+							data: { sn: sn, psw: psw },
+							url: url,
+							datatype: "json",
+							success: function(data) {
+								msg(data.info);
+								if(data.url) {
+									hrefTo(data.url);
+								} else {
+									msg(data.info);
+								}
+							}
+						});
+					},
+					no: function() {
+						layer.closeAll();
+						history.go(-1);
+					}
+				});
+			})
+		</script>
+
+	</body>
+
+</html>

@@ -1,0 +1,262 @@
+<!-- 隐藏弹出层-->
+<div class="dis_none" > 
+    <div id="giftbox">
+        <div class="gift_content"> 
+            <div class="gift_close">×</div>
+            <div class="list_con">
+                <foreach name="giftList" item="item">
+                    <div class="gift_list clearfix">
+                        <input type="hidden" class="gift_id" name="gift_id" value="{$item.gift_id}">
+                        <!-- 道具图片 -->
+                        <div class="gift_paint">
+                            <img src="{$item.img}">
+                            <div class="gift_name">{$item.name}+{$item.poll}票</div>
+                        </div>
+                        <!-- 选择道具数量 -->
+                        <div class="gift_count">
+                            <div class="gift_price">售价：<label class="price">{$item.price}</label>元</div>
+                            <div class="gift_sum">
+                                <span class="count">0</span>
+                                <img src="__PUBLIC__/Index/image/substract.png" class="icon_sub">
+                                <img src="__PUBLIC__/Index/image/add.png" class="icon_add">
+                            </div>
+                        </div>
+                    </div>
+                </foreach>
+            </div>
+        </div> 
+        <div class="gift_bottom clearfix"> 
+            <div class="prop_sum">
+                合计：
+                <label id="propsums">0.00元</label>
+            </div> 
+            <div class="gift_btn">
+                购买
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+</div>  
+
+<div class="lottery_box" style="display: none;">
+	<div class="confirm_to_lottery">
+		<div class="right_now">恭喜你获得抽奖机会</div>
+		<div class="lottery_url"><a href="{:U('Lottery/index')}">进入抽奖页面</a></div>
+		<div class="close" onclick="close_layer()">
+			<img src="__PUBLIC__/Index/image/close.png"/>
+		</div>
+	</div>
+</div>
+
+
+<script>
+    var giftContentHtml= $("#giftbox").html();
+    $("#giftbox").remove();
+    var query=new Object();
+
+    $(function(){
+        //绑定弹出礼物列表事件
+        $(".icon_gift").live('click',function(){
+        	//lzjadd:打入历史断点，用于返回时确认
+            var layindex=layer.open({type:2});
+            video=$('#video_box').html();
+            $('#video').remove();
+            layer.close(layindex);
+        	history.pushState({
+				"act": "gift_order"
+			}, "searchpage", "#gift"); //添加并替换历史纪录
+            giftlist();
+            $("body").addClass('noscorller');//禁止滚动条滚动
+            query.player_id=$(this).parent().find('input').val();
+            console.log(query);
+            // $(".gift_number").text($(this).attr('number')+"号");
+            // $(".gift_name").text($(this).attr('name'));
+            // $(".gift_works").text('《'+$(this).attr('works')+'》');
+            // $(".gift_votes").text($(this).attr('votes')+"票");
+            // $(".gift_img").attr('src',$(this).attr('pic'));
+            // $("#pay_player_id").val($(this).attr('player_id'));
+            // setAmount();
+        });
+        /**
+		 * 按返回事件
+		 */
+		window.addEventListener("popstate", function() {
+			var currentState = history.state;
+			console.log(currentState);
+			$("body").removeClass('noscorller');//允许滚动条滚动
+			layer.closeAll();
+		});
+    });
+
+    // 礼品清单
+    function giftlist(){
+        query=new Object();
+        var layindex=layer.open({
+            type: 1,
+            content:  giftContentHtml,
+            anim: 'up',
+            shadeClose:false,
+            style: 'position:fixed;top:10%;left:10%;bottom:1rem; width: 2.6rem;border:none;border-radius:0.05rem;height:3.8rem;'
+        });
+        $(".gift_close").click(function(){
+            layer.close(layindex);
+            history.go(-1);
+            $("body").removeClass('noscorller');//允许滚动条滚动
+        });
+        var $click = 1;
+
+        $(".sel_btn").click(function(){      
+            $(this).parent().find(".gift_selected").addClass('gift_show');
+            setAmount();
+            // $(this).parent().find(".gift_selected").show();     
+        });
+        $(".gift_selected").click(function(){
+            // $(this).hide();
+            $(this).removeClass('gift_show');
+            setAmount();
+        })
+
+        //增加按钮
+        $(".icon_add").click(function(){
+            $click++;
+            $(this).parents('.gift_list').addClass('gift_select');
+            // $(".gift_count").val($click);
+            var countspan=$(this).parent().find('.count');
+            var count=parseInt(countspan.html())+1;
+            countspan.html(count);
+            setAmount();
+        });
+
+        //减少按钮
+        $(".icon_sub").click(function(){
+            var countspan=$(this).parent().find('.count');
+            var count=parseInt(countspan.html())-1;
+            if(count>=0){
+                $click--;
+                countspan.html(count);
+            }
+            if(count==0){
+                $(this).parents('.gift_list').removeClass('gift_select');
+//                console.log($(this).parents('.gift_list').size());
+            }
+            setAmount();
+        });
+
+        //确认按钮
+        $('.gift_btn').click(function(){
+            url="{:U('Api/gift')}";
+            console.log(query);
+            // var tempQuery=query;
+            // var tempQ=new Object();
+            // tempQ.arr=new Array(1,2,3);
+            // tempQ.aaa='bbb';
+            // console.log(tempQ);
+            // return false;
+            // query.player_id=$("#pay_player_id").val();
+            // query.gift_id=$('.item_select').attr('gift_id');
+            // query.amount=$('#giftcount').val();
+            var layerIndex= loading('正在处理中...');
+            $.post(url,query,function (data) {
+                closeLayer(layerIndex);
+                if(data.status==1){
+                    //创建订单成功，发起支付
+                    jsApiCall(data.payinfo);
+                }else{
+                    msg(data.info);
+                }
+            },"json");
+        });
+
+        // 选择礼物后，移除其他礼物的选中样式
+        // $(".prop_item").click(function(){
+        //     $(this).addClass("item_select").siblings().removeClass("item_select");
+        //     setAmount();
+        // });
+
+//        console.log($(".gift_count").val());
+        // $(".gift_count").change(function(){
+        //     setAmount();
+        // });
+    };
+    /**
+     * 计算钱
+     */
+    function setAmount() {
+        // var price=parseFloat($(".item_select").attr('price'));
+        // var num=parseInt($(".gift_count").val());
+        // var sum=price*num;
+        // console.log(price);
+        // console.log(sum);
+        // $("#propsums").text(sum);
+        var giftList=$('.gift_select');
+        var sum=0;
+        query['gift']=new Array();
+        giftList.each(function(i){
+            var gift=new Object();
+            var div=$(this);
+            var price=parseFloat(div.find('.price').html());
+            var count=parseInt(div.find('.count').html());
+            sum+=(price*count);
+            gift.gift_id=div.find('.gift_id').val();
+            gift.amount=count;
+            query.gift[i]=gift;
+        });
+        console.log(query);
+        $('#propsums').html(sum.toFixed(2)+'元');
+    }
+
+    //调用微信JS api 支付
+    function jsApiCall(wxpayInfo)
+    {
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest',
+            wxpayInfo,
+           // {$jsApiParameters},
+            function(res){
+                if(res.err_msg.indexOf('ok')>-1){
+//                    loading("支付成功！正在跳转");
+//                    var url="{:U('Order/succ',array('o_id'=>$order['o_id']))}";
+////						alert(url);
+                    //支付成功，跳转到选手详情页
+//                  var player_id=query.player_id;
+//                  var url="{:U('Index/details',array('player_id'=>'pid','type'=>$type))}";
+//                  url=url.replace(/pid/,player_id);
+//                  hrefTo(url, 500);
+
+					//支付成功，询问是否进入抽奖页面
+					var lottery_html = $(".lottery_box").html();
+					layer.open({
+						type: 1,
+						content: lottery_html,
+						className: "confirm_to_lottery",
+						style: "border-radius:0.1rem",
+						shade: 'background-color: rgba(255,255,255,.7)'
+					});
+                }
+                if(res.err_msg.indexOf('cancel')>-1){
+                    msg('您取消了支付！');
+                }
+            }
+        );
+    }
+
+    function callpay()
+    {
+        if (typeof WeixinJSBridge == "undefined"){
+            if( document.addEventListener ){
+                document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+            }else if (document.attachEvent){
+                document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+                document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+            }
+        }else{
+            jsApiCall();
+        }
+    }
+    
+    function close_layer(){
+		layer.closeAll();
+		history.go(-1);
+	}
+</script>
+<!--END 隐藏弹出层-->
